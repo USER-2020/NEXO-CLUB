@@ -51,11 +51,11 @@ jobs:
       - name: Install frontend dependencies
         run: npm ci
 
+      - name: Build frontend
+        run: npm run build
+
       - name: Run migrations
         run: php artisan migrate --force --ansi
 
       - name: Run backend tests
         run: php artisan test --ansi
-
-      - name: Build frontend
-        run: npm run build
