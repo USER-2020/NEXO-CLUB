@@ -121,7 +121,7 @@ Después del primer inicio de sesión, cambia la contraseña temporal.
 El proyecto incluye dos workflows:
 
 - `.github/workflows/ci.yml`: ejecuta migraciones de prueba, tests PHP y compilación frontend en cada push y pull request.
-- `.github/workflows/deploy-hostinger.yml`: se ejecuta al hacer push a `main` o manualmente desde GitHub Actions. Compila PHP y Vite en GitHub, sube el paquete por SSH y ejecuta migraciones y cachés en Hostinger.
+- `.github/workflows/deploy-hostinger.yml`: después de que `CI` termina correctamente para un push a `main`, compila PHP y Vite, crea un tag/release `deploy-<commit>` y deja disponible el paquete. Actualmente no se conecta a Hostinger ni ejecuta migraciones remotas; esa integración se agregará cuando el servidor esté configurado.
 
 ### Configuración inicial
 
@@ -147,7 +147,7 @@ php artisan storage:link
 php artisan migrate --force
 ```
 
-Después de configurar los secrets, cada push a `main` despliega automáticamente. También puede lanzarse desde **Actions → Deploy to Hostinger → Run workflow**.
+Cada push exitoso a `main` crea automáticamente el release/tag. También puede lanzarse desde **Actions → Release NEXO CLUB → Run workflow**. Hostinger no participa todavía en este workflow.
 
 ### Recomendaciones de seguridad
 

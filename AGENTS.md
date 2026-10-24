@@ -93,8 +93,8 @@ php artisan migrate:fresh --seed
 ## CI y despliegue Hostinger
 
 - `.github/workflows/ci.yml` valida PHP, migraciones, tests y build frontend en cada push o pull request.
-- `.github/workflows/deploy-hostinger.yml` despliega automáticamente los pushes a `main` usando SSH. El paquete se compila en GitHub, por lo que Hostinger no necesita Node ni Composer para construir la aplicación.
-- Los secrets requeridos son `HOSTINGER_HOST`, `HOSTINGER_USER`, `HOSTINGER_SSH_KEY` y `HOSTINGER_APP_PATH`; `HOSTINGER_PORT` es opcional y usa `65002` por defecto.
+- `.github/workflows/deploy-hostinger.yml` espera a que el workflow `CI` termine correctamente para los pushes a `main`, crea un tag/release `deploy-<commit>` y no se conecta a Hostinger. La publicación en Hostinger queda para una integración futura separada.
+- La integración futura con Hostinger requerirá `HOSTINGER_HOST`, `HOSTINGER_USER`, `HOSTINGER_SSH_KEY` y `HOSTINGER_APP_PATH`; `HOSTINGER_PORT` será opcional y usará `65002` por defecto. Los workflows actuales no usan estos secrets.
 - El `.env`, `storage` y la base de datos viven únicamente en el servidor. El dominio debe apuntar a `HOSTINGER_APP_PATH/public`.
 - No agregar secretos de producción al repositorio ni ejecutar migraciones destructivas desde el workflow.
 
