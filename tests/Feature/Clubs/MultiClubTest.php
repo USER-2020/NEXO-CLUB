@@ -45,8 +45,8 @@ class MultiClubTest extends TestCase
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page
             ->component('Clubs/Index')
-            ->where('clubs.0.id', $clubA->id)
-            ->missing('clubs.1'));
+            ->where('clubs.data.0.id', $clubA->id)
+            ->where('clubs.data', fn ($clubs) => count($clubs) === 1));
     }
 
     public function test_user_without_a_club_can_open_configuration_without_a_403(): void
@@ -58,7 +58,7 @@ class MultiClubTest extends TestCase
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page
             ->component('Clubs/Index')
-            ->where('clubs', [])
+            ->where('clubs.data', [])
             ->where('canCreate', false));
     }
 
