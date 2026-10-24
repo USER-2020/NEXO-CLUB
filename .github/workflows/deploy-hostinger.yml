@@ -107,11 +107,27 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ needs.package.outputs.release_tag }}
           TARGET_SHA: ${{ needs.package.outputs.target_sha }}
+          REPOSITORY: ${{ github.repository }}
         run: |
           set -euo pipefail
           git tag "$RELEASE_TAG" "$TARGET_SHA"
           git push origin "$RELEASE_TAG"
+          commit_message="$(git log -1 --pretty=format:%B "$TARGET_SHA")"
+          {
+            echo "# Release $RELEASE_TAG"
+            echo
+            echo "Commit publicado: [$TARGET_SHA](https://github.com/$REPOSITORY/commit/$TARGET_SHA)"
+            echo
+            echo "## Mensaje del commit"
+            echo
+            echo '```text'
+            printf '%s\n' "$commit_message"
+            echo '```'
+            echo
+            echo "Las notas adicionales fueron generadas automáticamente por GitHub."
+          } > release-notes.md
           gh release create "$RELEASE_TAG" release.tar.gz \
             --title "NEXO CLUB $RELEASE_TAG" \
-            --notes "Release generado automáticamente desde CI para el commit $TARGET_SHA."
+            --notes-file release-notes.md \
+            --generate-notes
 
