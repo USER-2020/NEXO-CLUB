@@ -74,6 +74,7 @@ jobs:
               --exclude='storage/framework/views/*' \
               --exclude='database/database.sqlite' \
               --exclude='.env' \
+              --exclude='release.tar.gz' \
               -czf release.tar.gz .
 
       - name: Upload release artifact
