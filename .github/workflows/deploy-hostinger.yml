@@ -64,18 +64,19 @@ jobs:
 
       - name: Create release package
         run: |
+          set -euo pipefail
+          package_dir="$(mktemp -d)"
           tar --exclude='.git' \
               --exclude='.github' \
               --exclude='node_modules' \
               --exclude='tests' \
-              --exclude='storage/logs/*' \
-              --exclude='storage/framework/cache/data/*' \
-              --exclude='storage/framework/sessions/*' \
-              --exclude='storage/framework/views/*' \
+              --exclude='storage' \
               --exclude='database/database.sqlite' \
               --exclude='.env' \
               --exclude='release.tar.gz' \
-              -czf release.tar.gz .
+              -czf "$package_dir/release.tar.gz" .
+          cp "$package_dir/release.tar.gz" release.tar.gz
+          rm -rf "$package_dir"
 
       - name: Upload release artifact
         uses: actions/upload-artifact@v4
