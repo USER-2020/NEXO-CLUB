@@ -1,0 +1,10 @@
+import { router } from '@inertiajs/react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+
+type Props = { current_page: number; last_page: number; from?: number | null; to?: number | null; total?: number; per_page?: number };
+
+export default function Pagination({ current_page, last_page, from, to, total }: Props) {
+    if (last_page <= 1) return null;
+    const pages = Array.from({ length: last_page }, (_, index) => index + 1).filter((page) => page === 1 || page === last_page || Math.abs(page - current_page) <= 1);
+    return <div className="flex flex-col gap-3 border-t border-slate-800 p-4 text-sm sm:flex-row sm:items-center sm:justify-between"><p className="text-slate-500">Mostrando {from ?? 0}–{to ?? 0}{total !== undefined ? ` de ${total}` : ''}</p><div className="flex items-center gap-1"> <button type="button" disabled={current_page <= 1} onClick={() => router.get(window.location.href, { page: current_page - 1 }, { preserveScroll: true, preserveState: true })} className="rounded-lg border border-slate-700 p-2 text-slate-300 disabled:cursor-not-allowed disabled:opacity-40" aria-label="Página anterior"><ChevronLeft size={16} /></button>{pages.map((page, index) => <span key={page}>{index > 0 && pages[index - 1] !== page - 1 && <span className="px-1 text-slate-600">…</span>}<button type="button" onClick={() => router.get(window.location.href, { page }, { preserveScroll: true, preserveState: true })} className={`min-w-9 rounded-lg px-2.5 py-2 text-xs font-semibold ${page === current_page ? 'bg-nexo-lime text-nexo-ink' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>{page}</button></span>)}<button type="button" disabled={current_page >= last_page} onClick={() => router.get(window.location.href, { page: current_page + 1 }, { preserveScroll: true, preserveState: true })} className="rounded-lg border border-slate-700 p-2 text-slate-300 disabled:cursor-not-allowed disabled:opacity-40" aria-label="Página siguiente"><ChevronRight size={16} /></button></div></div>;
+}

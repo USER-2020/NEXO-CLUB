@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=1920,height=1080"><title>NEXO · Cobros y pagos</title>
+<style>
+:root{--ink:#08111f;--surface:#151f31;--surface-2:#101a2b;--line:#30415d;--muted:#91a1bb;--lime:#b4ff38;--mint:#58d6b0;--amber:#f6c847}
+*{box-sizing:border-box}html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:var(--ink);color:#f4f7fb;font-family:Inter,system-ui,sans-serif}body{background:radial-gradient(circle at 18% 15%,rgba(180,255,56,.14),transparent 30%),var(--ink)}
+.brand{position:absolute;top:58px;left:130px;display:flex;align-items:center;gap:16px;font-size:28px;font-weight:800}.mark{display:grid;place-items:center;width:52px;height:52px;border-radius:15px;background:var(--lime);color:var(--ink);font-size:28px}.brand-dot{color:var(--lime)}
+.content{position:absolute;left:130px;top:178px;width:800px}.eyebrow{color:var(--lime);font-size:20px;font-weight:800;letter-spacing:.2em;text-transform:uppercase}.title{margin:18px 0 0;font-size:68px;line-height:1.04;letter-spacing:-.06em}.subtitle{margin-top:24px;color:var(--muted);font-size:27px;line-height:1.4}.roles{display:flex;flex-wrap:wrap;gap:9px;margin-top:27px}.role{border:1px solid var(--line);border-radius:999px;padding:9px 14px;color:#dbe5f2;font-size:16px;font-weight:700;background:rgba(21,31,49,.8)}
+.steps{margin-top:34px;display:grid;gap:10px}.step{display:flex;align-items:center;gap:14px;border:1px solid var(--line);border-radius:15px;background:rgba(21,31,49,.9);padding:14px 18px;font-size:20px;font-weight:700;transition:.35s}.step.active{border-color:var(--lime);background:rgba(180,255,56,.12);transform:translateX(10px)}.step.done{color:#aeeecf;border-color:rgba(88,214,176,.5)}.number{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--lime);color:var(--ink);font-size:17px}.step.done .number{background:var(--mint)}
+.screen{position:absolute;right:130px;top:130px;width:740px;height:790px;border:1px solid var(--line);border-radius:26px;background:var(--surface-2);box-shadow:0 24px 80px rgba(0,0,0,.45);padding:25px;overflow:hidden}.bar{display:flex;justify-content:space-between;align-items:center;height:48px;border-bottom:1px solid #26344b;color:#8fa0ba;font-size:16px;font-weight:700}.bar-label{display:flex;align-items:center}.dot{display:inline-block;width:11px;height:11px;margin-right:10px;border-radius:50%;background:var(--lime)}.user-chip{border:1px solid var(--line);border-radius:999px;padding:7px 12px;color:#dbe5f2;font-size:13px}.panel{margin-top:22px;border:1px solid #26344b;border-radius:18px;background:var(--surface);padding:23px;min-height:550px;position:relative}.panel h2{margin:0;font-size:28px}.panel-subtitle{margin:8px 0 20px;color:var(--muted);font-size:16px}.field{margin-top:14px;border:1px solid #344967;border-radius:12px;background:#0d1728;padding:14px 16px;color:#dbe5f2;font-size:18px;min-height:51px;position:relative}.field.focus{border-color:var(--lime);box-shadow:0 0 0 3px rgba(180,255,56,.12)}.field-label{display:block;margin-bottom:7px;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.12em}.field-value{min-height:23px}.caret{display:inline-block;width:2px;height:21px;margin-left:3px;background:var(--lime);vertical-align:middle;animation:blink .7s infinite}@keyframes blink{50%{opacity:0}}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid #26344b;padding:17px 0;color:#dbe5f2;font-size:17px;transition:.3s}.row:last-child{border-bottom:0}.row.highlight{color:#fff;background:rgba(180,255,56,.07);margin:0 -10px;padding-left:10px;padding-right:10px;border-radius:9px}.pill{border-radius:999px;padding:6px 10px;background:rgba(88,214,176,.12);color:var(--mint);font-size:12px;font-weight:800}.button{display:inline-flex;align-items:center;gap:8px;margin-top:22px;border:0;border-radius:11px;padding:13px 19px;background:var(--lime);color:var(--ink);font-size:16px;font-weight:900}.button.loading{background:#78933e}.check{display:inline-grid;place-items:center;width:21px;height:21px;border-radius:50%;background:var(--mint);color:var(--ink);font-size:13px}.toast{position:absolute;right:22px;bottom:22px;border:1px solid rgba(88,214,176,.5);border-radius:13px;background:#10271f;color:#c8f9e4;padding:14px 18px;font-size:15px;font-weight:800;opacity:0;transform:translateY(12px);transition:.4s}.toast.visible{opacity:1;transform:translateY(0)}.spinner{display:inline-block;width:17px;height:17px;border:2px solid rgba(8,17,31,.35);border-top-color:var(--ink);border-radius:50%;animation:spin .7s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.cursor{position:absolute;z-index:10;width:31px;height:31px;border:3px solid #fff;border-radius:50%;box-shadow:0 0 0 7px rgba(180,255,56,.22),0 5px 20px rgba(0,0,0,.55);pointer-events:none;transition:left .55s cubic-bezier(.2,.8,.2,1),top .55s cubic-bezier(.2,.8,.2,1);opacity:0}.cursor.visible{opacity:1}.click-ring{position:absolute;width:58px;height:58px;border:3px solid var(--lime);border-radius:50%;opacity:0;pointer-events:none}.click-ring.show{animation:click .65s ease-out}@keyframes click{0%{opacity:1;transform:scale(.35)}100%{opacity:0;transform:scale(1.4)}}
+.progress{position:absolute;left:130px;right:130px;bottom:69px;height:6px;border-radius:10px;background:#26344b;overflow:hidden}.progress-fill{height:100%;width:0;background:var(--lime);transition:width .1s linear}.caption{position:absolute;left:130px;bottom:91px;color:#9cacbf;font-size:18px}.footer{position:absolute;right:130px;bottom:91px;color:#657590;font-size:18px}
+</style></head><body>
+<div id="root" data-composition-id="mensualidades-cobros" data-width="1920" data-height="1080" data-duration="12" data-no-timeline="true">
+<div class="brand"><span class="mark">N</span><span>NEXO<span class="brand-dot">.</span></span></div>
+<main class="content"><div class="eyebrow">Mensualidades · Billing Console</div><h1 class="title">Cobros y pagos</h1><p class="subtitle">Recorrido interactivo de demostración con datos controlados.</p><div class="roles"><span class="role">Admin</span><span class="role">Contador</span></div><div class="steps"><div class="step" data-step="0"><span class="number">1</span><span>Generar cargo</span></div><div class="step" data-step="1"><span class="number">2</span><span>Revisar vencimiento</span></div><div class="step" data-step="2"><span class="number">3</span><span>Registrar o verificar pago</span></div><div class="step" data-step="3"><span class="number">4</span><span>Reactivar inscripción</span></div></div></main>
+<section class="screen"><div class="bar"><span class="bar-label"><span class="dot"></span>NEXO · Billing Console</span><span class="user-chip">Sesión demo</span></div><div class="panel"><h2 id="panel-title">Cobros y pagos</h2><p id="panel-subtitle" class="panel-subtitle">Preparando flujo...</p><div id="app-content"></div><button id="action-button" class="button" type="button">Continuar</button><div id="toast" class="toast"><span class="check">✓</span> Operación completada</div></div><div id="cursor" class="cursor"></div><div id="click-ring" class="click-ring"></div></section>
+<div class="caption" id="caption">Iniciando recorrido</div><div class="footer">NEXO · documentación visual por rol y módulo</div><div class="progress"><div id="progress-fill" class="progress-fill"></div></div>
+</div>
+<script>
+(() => {
+  const root = document.getElementById('root');
+  const app = document.getElementById('app-content');
+  const button = document.getElementById('action-button');
+  const toast = document.getElementById('toast');
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('click-ring');
+  const caption = document.getElementById('caption');
+  const progress = document.getElementById('progress-fill');
+  const subtitle = document.getElementById('panel-subtitle');
+  const stepNodes = [...document.querySelectorAll('.step')];
+  const duration = 12;
+  const captions = ['Abrir módulo y preparar datos', 'Completar información del flujo', 'Validar y guardar la operación', 'Actualizar el estado en tiempo real'];
+  const phaseData = [
+    { fields: [['Usuario', 'Juan Fernando Zuluaga'], ['Club activo', 'NEXO Club Demo']], button: 'Iniciar sesión' },
+    { fields: [['Deportista', 'Juan Fernando Zuluaga'], ['Referencia', 'NEXO-2026-1024']], button: 'Guardar cambios' },
+    { fields: [['Estado de validación', 'Información verificada'], ['Permisos', 'Acceso autorizado']], button: 'Confirmar operación' },
+    { fields: [['Resultado', 'Operación registrada'], ['Siguiente estado', 'Activo / actualizado']], button: 'Listo' },
+  ];
+  let lastPhase = -1;
+  function typeText(value, amount) { return value.slice(0, Math.max(0, Math.min(value.length, Math.floor(amount * value.length)))); }
+  function renderPhase(phase, local) {
+    const data = phaseData[phase];
+    const typing = phase === 1 && local < .8;
+    const firstValue = typing ? typeText(data.fields[0][1], local / .8) : data.fields[0][1];
+    app.innerHTML = data.fields.map(([label, value], index) => '<div class="field ' + (typing && index === 0 ? 'focus' : '') + '"><span class="field-label">' + label + '</span><span class="field-value">' + (index === 0 ? firstValue : value) + (typing && index === 0 ? '<span class="caret"></span>' : '') + '</span></div>').join('');
+    button.innerHTML = phase === 2 && local < .45 ? '<span class="spinner"></span> Validando...' : data.button;
+    button.classList.toggle('loading', phase === 2 && local < .45);
+    subtitle.textContent = phase === 0 ? 'Consulta el espacio correcto según el rol.' : phase === 1 ? 'Los datos se completan paso a paso.' : phase === 2 ? 'El sistema valida permisos y reglas del club.' : 'La información queda reflejada en el módulo.';
+    toast.classList.toggle('visible', phase === 3 && local > .35);
+    stepNodes.forEach((node, index) => { node.classList.toggle('active', index === phase); node.classList.toggle('done', index < phase || (phase === 3 && local > .7)); });
+    caption.textContent = captions[phase];
+    const positions = [[535, 390], [425, 525], [560, 650], [505, 750]];
+    cursor.style.left = positions[phase][0] + 'px'; cursor.style.top = positions[phase][1] + 'px'; cursor.classList.add('visible');
+    if (phase !== lastPhase) { ring.classList.remove('show'); void ring.offsetWidth; ring.classList.add('show'); }
+    lastPhase = phase;
+  }
+  function tick(now) { const t = Math.min(duration, (now - start) / 1000); const phase = Math.min(3, Math.floor(t / 3)); renderPhase(phase, (t % 3) / 3); progress.style.width = ((t / duration) * 100) + '%'; if (t < duration) requestAnimationFrame(tick); }
+  const start = performance.now(); requestAnimationFrame(tick);
+})();
+</script></body></html>

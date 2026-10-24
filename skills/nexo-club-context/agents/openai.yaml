@@ -1,0 +1,4 @@
+interface:
+  display_name: "NEXO CLUB Context"
+  short_description: "Contexto y convenciones del proyecto NEXO CLUB"
+  default_prompt: "Usa este contexto para continuar el desarrollo de NEXO CLUB con sus convenciones de arquitectura, UI y seguridad."

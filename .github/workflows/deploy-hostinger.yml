@@ -1,0 +1,115 @@
+name: Deploy to Hostinger
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, sqlite3, pdo_sqlite
+          tools: composer:v2
+          coverage: none
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install production PHP dependencies
+        run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-progress
+
+      - name: Build frontend assets
+        run: |
+          npm ci
+          npm run build
+
+      - name: Create release package
+        run: |
+          tar --exclude='.git' \
+              --exclude='.github' \
+              --exclude='node_modules' \
+              --exclude='tests' \
+              --exclude='storage/logs/*' \
+              --exclude='storage/framework/cache/data/*' \
+              --exclude='storage/framework/sessions/*' \
+              --exclude='storage/framework/views/*' \
+              --exclude='database/database.sqlite' \
+              --exclude='.env' \
+              -czf release.tar.gz .
+
+      - name: Upload release artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nexo-club-release
+          path: release.tar.gz
+          if-no-files-found: error
+          retention-days: 3
+
+  deploy:
+    needs: package
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Download release artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: nexo-club-release
+
+      - name: Upload release to Hostinger
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.HOSTINGER_HOST }}
+          username: ${{ secrets.HOSTINGER_USER }}
+          key: ${{ secrets.HOSTINGER_SSH_KEY }}
+          port: ${{ secrets.HOSTINGER_PORT || 65002 }}
+          source: release.tar.gz
+          target: ${{ secrets.HOSTINGER_APP_PATH }}/.deploy
+          overwrite: true
+
+      - name: Activate release on Hostinger
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          APP_PATH: ${{ secrets.HOSTINGER_APP_PATH }}
+          RELEASE_FILE: ${{ secrets.HOSTINGER_APP_PATH }}/.deploy/release.tar.gz
+        with:
+          host: ${{ secrets.HOSTINGER_HOST }}
+          username: ${{ secrets.HOSTINGER_USER }}
+          key: ${{ secrets.HOSTINGER_SSH_KEY }}
+          port: ${{ secrets.HOSTINGER_PORT || 65002 }}
+          envs: APP_PATH,RELEASE_FILE
+          script_stop: true
+          script: |
+            set -e
+            mkdir -p "$APP_PATH/.deploy/current"
+            rm -rf "$APP_PATH/.deploy/current"/*
+            tar -xzf "$RELEASE_FILE" -C "$APP_PATH/.deploy/current"
+
+            # El .env y el storage pertenecen al servidor y nunca se sobrescriben.
+            cp -a "$APP_PATH/.deploy/current/." "$APP_PATH/"
+            rm -rf "$APP_PATH/.deploy/current" "$RELEASE_FILE"
+
+            cd "$APP_PATH"
+            php artisan storage:link || true
+            php artisan migrate --force --no-interaction
+            php artisan optimize:clear
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache

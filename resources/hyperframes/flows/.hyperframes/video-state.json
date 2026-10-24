@@ -1,0 +1,312 @@
+{
+  "version": 1,
+  "historyId": "9bc054e5-2d01-4dce-99cb-5223c97529d2",
+  "currentRevision": "cd7f34a9-0f20-4406-b057-a20ecae2ae4f",
+  "pendingChanges": false,
+  "files": {
+    "index.html": {
+      "hash": "0be40e940adcdf6accad7209df66db5ea4814052fdcf9f633d8c95a2ab706b05",
+      "content": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/0b/0be40e940adcdf6accad7209df66db5ea4814052fdcf9f633d8c95a2ab706b05"
+    },
+    "individual/acceso-roles.html": {
+      "hash": "753891c7d561ecab0f23a5546a880d10147502ba2691981abef0ee7c17707529",
+      "content": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/75/753891c7d561ecab0f23a5546a880d10147502ba2691981abef0ee7c17707529"
+    },
+    "individual/auditoria-operaciones.html": {
+      "hash": "7cbfab7d69e5ab5e18b658ed8b3336886a4627469db205d10478da934bd8b431",
+      "content": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/7c/7cbfab7d69e5ab5e18b658ed8b3336886a4627469db205d10478da934bd8b431"
+    },
+    "individual/club-configuracion.html": {
+      "hash": "c37d7b83a045efeb847d63ec28d949e49380bddcdcbc0fdb8d626c4fd115f2c6",
+      "content": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/c3/c37d7b83a045efeb847d63ec28d949e49380bddcdcbc0fdb8d626c4fd115f2c6"
+    },
+    "individual/clubes-global.html": {
+      "hash": "5808729e0073dc572261319231cc82ed0fea2ba032863bfb9c5869c45f7cc9c6",
+      "content": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/58/5808729e0073dc572261319231cc82ed0fea2ba032863bfb9c5869c45f7cc9c6"
+    },
+    "individual/deportistas-perfil.html": {
+      "hash": "0d88740140bbee75f4164022564b8957197a39c45429c75f1cc8a268d1e3c29f",
+      "content": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/0d/0d88740140bbee75f4164022564b8957197a39c45429c75f1cc8a268d1e3c29f"
+    },
+    "individual/equipo-permisos.html": {
+      "hash": "48b1b05779d66c9c1948682404e52ac68d81dd6fe1384ec9bd932a75ed8480da",
+      "content": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/48/48b1b05779d66c9c1948682404e52ac68d81dd6fe1384ec9bd932a75ed8480da"
+    },
+    "individual/inscripciones.html": {
+      "hash": "a0c84910eee1c1b8a41a29b2b9278f95fa25ab32573c7adfd375f3f8d6d19a15",
+      "content": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/a0/a0c84910eee1c1b8a41a29b2b9278f95fa25ab32573c7adfd375f3f8d6d19a15"
+    },
+    "individual/mensualidades-cobros.html": {
+      "hash": "2389147b049d4a3c2dcb47675fcc5cf449bfa5267a763876a8c958d9a415b2da",
+      "content": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/23/2389147b049d4a3c2dcb47675fcc5cf449bfa5267a763876a8c958d9a415b2da"
+    },
+    "individual/mensualidades-comprobante.html": {
+      "hash": "829095701af6fbd2521c77f845a5d0e64d2eaab386dd213ffc3d29eda9eaafb6",
+      "content": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/82/829095701af6fbd2521c77f845a5d0e64d2eaab386dd213ffc3d29eda9eaafb6"
+    },
+    "individual/portal-deportista.html": {
+      "hash": "44222bf2f9b665a2b5ca6f9e63cdc6f798e39d241c7ae0e2da305cf43bacd992",
+      "content": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/44/44222bf2f9b665a2b5ca6f9e63cdc6f798e39d241c7ae0e2da305cf43bacd992"
+    }
+  },
+  "revisions": {
+    "7533ca08-5d67-4f57-a641-cfd6bc3e5e0a": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1792829582156,
+      "endedAt": 1792829582156,
+      "files": {
+        "index.html": {
+          "before": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/2a/2a0ca3028aa23ed60907930e19a47f0d767b5bf747af686ee86101965d05bdc0",
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/8b/8bc98d495ca6dba88be72a9dcb5262509785303f3f6c7e643758f1a413a0f0a9"
+        }
+      }
+    },
+    "9347987a-4552-4db1-a12c-23ccb868aafb": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1792829790114,
+      "endedAt": 1792829790114,
+      "files": {
+        "index.html": {
+          "before": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/8b/8bc98d495ca6dba88be72a9dcb5262509785303f3f6c7e643758f1a413a0f0a9",
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/0b/0be40e940adcdf6accad7209df66db5ea4814052fdcf9f633d8c95a2ab706b05"
+        }
+      }
+    },
+    "293de17d-a697-4616-ba90-c93ea2fe7b87": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1792830253898,
+      "endedAt": 1792830253909,
+      "files": {
+        "individual/acceso-roles.html": {
+          "before": null,
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/c6/c6c5645088dda515cfa1b62dc84cfd4271f9dd1932577754734e273ec3671ec9"
+        },
+        "individual/auditoria-operaciones.html": {
+          "before": null,
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/a7/a770d322339c95544168025cc7702e52dfab673fa18360d86097fcf67975d737"
+        },
+        "individual/club-configuracion.html": {
+          "before": null,
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/15/15db9abf9aa07a3cf711ebaef6a9b0a2b9df96d9a0c32140bf29712eac5c35fa"
+        },
+        "individual/clubes-global.html": {
+          "before": null,
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/dc/dcd92326598ceac6863f6a32ca739e433608a4846c549b8e957c318b63c41f5c"
+        },
+        "individual/deportistas-perfil.html": {
+          "before": null,
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/c3/c3196ef935d01637fd14328cfb02a59345c0bf49d25ed468a601862c087edb8f"
+        },
+        "individual/equipo-permisos.html": {
+          "before": null,
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/0d/0d8dde72ee589575d47a82de8a2658ad8d5f27974bd2282ee842d2a665511d3b"
+        },
+        "individual/inscripciones.html": {
+          "before": null,
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/71/717449f02d9d4e7387904c2dbd3a77f1bf47a773e7a3653154462d8fae9bff48"
+        },
+        "individual/mensualidades-cobros.html": {
+          "before": null,
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/6f/6f8ccb7d6ae1b010491eec44a4021cffb69662e453b442ce1914dae4e44e380f"
+        },
+        "individual/mensualidades-comprobante.html": {
+          "before": null,
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/2c/2c084d380733b7bad3facff5f00a598bec5217ed20d0f95fe01ada3c54df111a"
+        },
+        "individual/portal-deportista.html": {
+          "before": null,
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/2e/2ebe338ed6fee62ed2798d771ff24278ceb2c93b0a125f729d32b7a7a718f2bd"
+        }
+      }
+    },
+    "db5e66d2-23d5-49a7-bd94-c7b80f7f919c": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1792830304371,
+      "endedAt": 1792830304381,
+      "files": {
+        "individual/acceso-roles.html": {
+          "before": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/c6/c6c5645088dda515cfa1b62dc84cfd4271f9dd1932577754734e273ec3671ec9",
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/17/170cb9454ffb7369e9a7b29d07fa9bdc2955e4f6224691e634ac429a71c56e13"
+        },
+        "individual/auditoria-operaciones.html": {
+          "before": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/a7/a770d322339c95544168025cc7702e52dfab673fa18360d86097fcf67975d737",
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/f0/f061435cd748e5dab16a206289763b057316b9412521826408d518d1f743f58d"
+        },
+        "individual/club-configuracion.html": {
+          "before": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/15/15db9abf9aa07a3cf711ebaef6a9b0a2b9df96d9a0c32140bf29712eac5c35fa",
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/42/422fe75d15b32004d5dbe8d1de7e351e06cd28f845fe9599eb819300e5a759c2"
+        },
+        "individual/clubes-global.html": {
+          "before": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/dc/dcd92326598ceac6863f6a32ca739e433608a4846c549b8e957c318b63c41f5c",
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/42/429d7c4295f9ef7ffdaac88c6a764884d5ac945b04c0db138806b74396263a3a"
+        },
+        "individual/deportistas-perfil.html": {
+          "before": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/c3/c3196ef935d01637fd14328cfb02a59345c0bf49d25ed468a601862c087edb8f",
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/d3/d37d01db46c2707f9d854fb4949c3a39edf06633ee1748069a5eb1a061a9f70b"
+        },
+        "individual/equipo-permisos.html": {
+          "before": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/0d/0d8dde72ee589575d47a82de8a2658ad8d5f27974bd2282ee842d2a665511d3b",
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/35/3513ff64f0a898871716d71f08639e674b3e10afdeeb4c0bd5826b62fa0e541d"
+        },
+        "individual/inscripciones.html": {
+          "before": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/71/717449f02d9d4e7387904c2dbd3a77f1bf47a773e7a3653154462d8fae9bff48",
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/a9/a9e0ebd1e7368d6f1a9c13ffebd37f72adbf9d2706773b449bab3149cb42e91d"
+        },
+        "individual/mensualidades-cobros.html": {
+          "before": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/6f/6f8ccb7d6ae1b010491eec44a4021cffb69662e453b442ce1914dae4e44e380f",
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/a9/a911b88e20e944be0298cb4e048bfe5e8352f22c4da85d3d4b18cd56ffc94f20"
+        },
+        "individual/mensualidades-comprobante.html": {
+          "before": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/2c/2c084d380733b7bad3facff5f00a598bec5217ed20d0f95fe01ada3c54df111a",
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/e5/e5e952300a2fc633fed645f2eaa2f707e13e3a0768d1334d24038640571a1422"
+        },
+        "individual/portal-deportista.html": {
+          "before": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/2e/2ebe338ed6fee62ed2798d771ff24278ceb2c93b0a125f729d32b7a7a718f2bd",
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/e5/e5a7ce59e5f89b2ef10224adea6671a17dbce198386155760785653bf9c91614"
+        }
+      }
+    },
+    "c707cf1d-b864-48f9-85f0-5225fe6e0f10": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1792830801345,
+      "endedAt": 1792830801356,
+      "files": {
+        "individual/acceso-roles.html": {
+          "before": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/17/170cb9454ffb7369e9a7b29d07fa9bdc2955e4f6224691e634ac429a71c56e13",
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/f8/f87ad954473becf92e3dc02288a41b2f1a6ef2a147e1c0e91551567f12cc4407"
+        },
+        "individual/auditoria-operaciones.html": {
+          "before": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/f0/f061435cd748e5dab16a206289763b057316b9412521826408d518d1f743f58d",
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/1d/1d7de9a566afc5785f73a7b3d995792adc8c8b810a620fc118489a17d3ff881e"
+        },
+        "individual/club-configuracion.html": {
+          "before": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/42/422fe75d15b32004d5dbe8d1de7e351e06cd28f845fe9599eb819300e5a759c2",
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/13/13f6b9fdf75c2947736afc79c05a50ce2dff9c2f2135bd326a443212f92f8031"
+        },
+        "individual/clubes-global.html": {
+          "before": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/42/429d7c4295f9ef7ffdaac88c6a764884d5ac945b04c0db138806b74396263a3a",
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/64/6474e0fce9a25b64859207162f572fbdb9f11dae8f01e8774c856ddc7f54c7fa"
+        },
+        "individual/deportistas-perfil.html": {
+          "before": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/d3/d37d01db46c2707f9d854fb4949c3a39edf06633ee1748069a5eb1a061a9f70b",
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/94/947202349781ffa5dbdc00e4324af97c9d1bf959a914fda19d10c090e441881f"
+        },
+        "individual/equipo-permisos.html": {
+          "before": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/35/3513ff64f0a898871716d71f08639e674b3e10afdeeb4c0bd5826b62fa0e541d",
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/92/92c4e4e865f261ba36f93e6c737541697c05b64c9d2bc0c540c31f63f344a86a"
+        },
+        "individual/inscripciones.html": {
+          "before": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/a9/a9e0ebd1e7368d6f1a9c13ffebd37f72adbf9d2706773b449bab3149cb42e91d",
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/cf/cff88ff0c7fd3ea37cf280ba8465514e373b2ed9ee65bb80d6f06c77cdc03d7b"
+        },
+        "individual/mensualidades-cobros.html": {
+          "before": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/a9/a911b88e20e944be0298cb4e048bfe5e8352f22c4da85d3d4b18cd56ffc94f20",
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/b8/b896aaf0f2f6b1db3a4ccb58a85288ce8329e9775379d269dfbe7e06314c4886"
+        },
+        "individual/mensualidades-comprobante.html": {
+          "before": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/e5/e5e952300a2fc633fed645f2eaa2f707e13e3a0768d1334d24038640571a1422",
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/42/4220930375f7b26629a5bbf7cbb8866bce4d2b7b657b3321a9645449d09e8103"
+        },
+        "individual/portal-deportista.html": {
+          "before": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/e5/e5a7ce59e5f89b2ef10224adea6671a17dbce198386155760785653bf9c91614",
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/25/25630efdbb8e383cfd68d4021da996522e9e88d4be8b975b51b4d5b4620fee1a"
+        }
+      }
+    },
+    "cd7f34a9-0f20-4406-b057-a20ecae2ae4f": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1792830871279,
+      "endedAt": 1792830871289,
+      "files": {
+        "individual/acceso-roles.html": {
+          "before": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/f8/f87ad954473becf92e3dc02288a41b2f1a6ef2a147e1c0e91551567f12cc4407",
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/75/753891c7d561ecab0f23a5546a880d10147502ba2691981abef0ee7c17707529"
+        },
+        "individual/auditoria-operaciones.html": {
+          "before": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/1d/1d7de9a566afc5785f73a7b3d995792adc8c8b810a620fc118489a17d3ff881e",
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/7c/7cbfab7d69e5ab5e18b658ed8b3336886a4627469db205d10478da934bd8b431"
+        },
+        "individual/club-configuracion.html": {
+          "before": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/13/13f6b9fdf75c2947736afc79c05a50ce2dff9c2f2135bd326a443212f92f8031",
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/c3/c37d7b83a045efeb847d63ec28d949e49380bddcdcbc0fdb8d626c4fd115f2c6"
+        },
+        "individual/clubes-global.html": {
+          "before": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/64/6474e0fce9a25b64859207162f572fbdb9f11dae8f01e8774c856ddc7f54c7fa",
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/58/5808729e0073dc572261319231cc82ed0fea2ba032863bfb9c5869c45f7cc9c6"
+        },
+        "individual/deportistas-perfil.html": {
+          "before": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/94/947202349781ffa5dbdc00e4324af97c9d1bf959a914fda19d10c090e441881f",
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/0d/0d88740140bbee75f4164022564b8957197a39c45429c75f1cc8a268d1e3c29f"
+        },
+        "individual/equipo-permisos.html": {
+          "before": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/92/92c4e4e865f261ba36f93e6c737541697c05b64c9d2bc0c540c31f63f344a86a",
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/48/48b1b05779d66c9c1948682404e52ac68d81dd6fe1384ec9bd932a75ed8480da"
+        },
+        "individual/inscripciones.html": {
+          "before": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/cf/cff88ff0c7fd3ea37cf280ba8465514e373b2ed9ee65bb80d6f06c77cdc03d7b",
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/a0/a0c84910eee1c1b8a41a29b2b9278f95fa25ab32573c7adfd375f3f8d6d19a15"
+        },
+        "individual/mensualidades-cobros.html": {
+          "before": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/b8/b896aaf0f2f6b1db3a4ccb58a85288ce8329e9775379d269dfbe7e06314c4886",
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/23/2389147b049d4a3c2dcb47675fcc5cf449bfa5267a763876a8c958d9a415b2da"
+        },
+        "individual/mensualidades-comprobante.html": {
+          "before": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/42/4220930375f7b26629a5bbf7cbb8866bce4d2b7b657b3321a9645449d09e8103",
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/82/829095701af6fbd2521c77f845a5d0e64d2eaab386dd213ffc3d29eda9eaafb6"
+        },
+        "individual/portal-deportista.html": {
+          "before": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/25/25630efdbb8e383cfd68d4021da996522e9e88d4be8b975b51b4d5b4620fee1a",
+          "after": "/Users/juanfernandozuluagaaguirre/.cache/hyperframes/history/9bc054e5-2d01-4dce-99cb-5223c97529d2/blobs/44/44222bf2f9b665a2b5ca6f9e63cdc6f798e39d241c7ae0e2da305cf43bacd992"
+        }
+      }
+    }
+  },
+  "checks": {
+    "latest": null,
+    "revisions": {},
+    "unversioned": []
+  },
+  "snapshots": {
+    "latest": null,
+    "revisions": {},
+    "unversioned": []
+  },
+  "renders": {
+    "latest": {
+      "id": "394f30eb-d193-4e8d-a555-9e4920c4c8aa",
+      "completedAt": 1792831102517,
+      "output": "/Users/juanfernandozuluagaaguirre/Documents/GitHub/NEXO-CLUB/public/flow-videos/portal-deportista.mp4",
+      "status": "completed",
+      "revision": "cd7f34a9-0f20-4406-b057-a20ecae2ae4f"
+    },
+    "retainedRevisions": [
+      "cd7f34a9-0f20-4406-b057-a20ecae2ae4f",
+      "c707cf1d-b864-48f9-85f0-5225fe6e0f10"
+    ]
+  },
+  "pendingArtifactCleanup": []
+}
