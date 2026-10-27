@@ -12,17 +12,31 @@ class SuperadminUserSeeder extends Seeder
 {
     public function run(): void
     {
+        $name = env('SUPERADMIN_NAME');
+        $email = env('SUPERADMIN_EMAIL');
+        $password = env('SUPERADMIN_PASSWORD');
+
+        if (blank($name) || blank($email) || blank($password)) {
+            throw new \RuntimeException(
+                'Faltan SUPERADMIN_NAME, SUPERADMIN_EMAIL o SUPERADMIN_PASSWORD en el archivo .env.'
+            );
+        }
+
         $club = app()->environment('production')
             ? null
             : Club::where('slug', 'nexo-club-demo')->firstOrFail();
 
         app(PermissionRegistrar::class)->setPermissionsTeamId($club?->id);
-        Role::firstOrCreate(['name' => 'superadmin', 'guard_name' => 'web', 'team_id' => $club?->id]);
+        $superadminRole = Role::firstOrCreate([
+            'name' => 'superadmin',
+            'guard_name' => 'web',
+            'team_id' => $club?->id,
+        ]);
         $user = User::updateOrCreate(
-            ['email' => env('SUPERADMIN_EMAIL', 'superadmin@nexo.club')],
+            ['email' => $email],
             [
-                'name' => env('SUPERADMIN_NAME', 'Superadmin NEXO CLUB'),
-                'password' => env('SUPERADMIN_PASSWORD', 'NexoSuper2026!'),
+                'name' => $name,
+                'password' => $password,
                 'email_verified_at' => now(),
             ],
         );
@@ -33,6 +47,6 @@ class SuperadminUserSeeder extends Seeder
         }
 
         app(PermissionRegistrar::class)->setPermissionsTeamId($club?->id);
-        $user->syncRoles(['superadmin']);
+        $user->syncRoles([$superadminRole]);
     }
 }
