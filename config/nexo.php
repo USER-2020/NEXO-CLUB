@@ -1,6 +1,12 @@
 <?php
 
 return [
+    'superadmin' => [
+        'name' => env('SUPERADMIN_NAME'),
+        'email' => env('SUPERADMIN_EMAIL'),
+        'password' => env('SUPERADMIN_PASSWORD'),
+    ],
+
     'notifications' => [
         // Preparado para producción, pero apagado por defecto hasta configurar SMTP.
         'enabled' => (bool) env('NEXO_NOTIFICATIONS_ENABLED', false),

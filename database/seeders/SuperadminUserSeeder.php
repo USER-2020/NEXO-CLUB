@@ -12,9 +12,9 @@ class SuperadminUserSeeder extends Seeder
 {
     public function run(): void
     {
-        $name = env('SUPERADMIN_NAME');
-        $email = env('SUPERADMIN_EMAIL');
-        $password = env('SUPERADMIN_PASSWORD');
+        $name = config('nexo.superadmin.name');
+        $email = config('nexo.superadmin.email');
+        $password = config('nexo.superadmin.password');
 
         if (blank($name) || blank($email) || blank($password)) {
             throw new \RuntimeException(
