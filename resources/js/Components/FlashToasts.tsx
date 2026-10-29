@@ -1,6 +1,7 @@
-import { usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
+import { confirmToast } from '@/Components/ConfirmToast';
 import Pagination from '@/Components/Pagination';
 import SmartSearch from '@/Components/SmartSearch';
 
@@ -9,6 +10,7 @@ type FlashProps = {
     error?: string;
     createdAccess?: unknown;
     athleteAccess?: { name: string; email: string; password: string };
+    verificationRequired?: { applicationId: number; email: string };
 };
 
 export default function FlashToasts() {
@@ -43,7 +45,16 @@ export default function FlashToasts() {
         if (flash.error) {
             toast.error(flash.error);
         }
-    }, [flash.error, flash.success, flash.createdAccess, flash.athleteAccess, operationActive]);
+
+        if (flash.verificationRequired) {
+            confirmToast({
+                title: 'Correo pendiente de confirmación',
+                description: `El solicitante aún no confirmó ${flash.verificationRequired.email}. ¿Quieres reenviar el enlace?`,
+                confirmLabel: 'Reenviar correo',
+                onConfirm: () => router.post(route('platform.club-applications.resend-verification', flash.verificationRequired!.applicationId), {}, { preserveScroll: true }),
+            });
+        }
+    }, [flash.error, flash.success, flash.createdAccess, flash.athleteAccess, flash.verificationRequired, operationActive]);
 
     return <><SmartSearch />{pagination ? <div className="fixed bottom-4 right-4 z-50 w-[min(92vw,520px)] rounded-2xl border border-slate-700 bg-nexo-surface shadow-2xl lg:bottom-6 lg:right-6"><Pagination {...pagination} /></div> : null}</>;
 }

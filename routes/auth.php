@@ -17,6 +17,13 @@ Route::middleware('guest')->group(function () {
 
     Route::post('register', [RegisteredUserController::class, 'store']);
 
+    Route::get('registro/solicitud-enviada', [RegisteredUserController::class, 'submitted'])
+        ->name('registration.submitted');
+
+    Route::get('registro/verificar/{user}/{hash}', [RegisteredUserController::class, 'verifyEmail'])
+        ->middleware('signed')
+        ->name('registration.verify');
+
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
 

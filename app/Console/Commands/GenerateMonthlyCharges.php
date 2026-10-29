@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Enrollment;
 use App\Models\MonthlyCharge;
+use App\Services\BillingPeriodService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 
@@ -16,22 +17,35 @@ class GenerateMonthlyCharges extends Command
     public function handle(): int
     {
         $today = $this->option('date') ? Carbon::parse($this->option('date'))->startOfDay() : Carbon::today();
-        $period = $today->copy()->startOfMonth();
         $created = 0;
         $overdue = 0;
 
         Enrollment::query()
             ->where('status', 'active')
             ->whereDate('start_date', '<=', $today)
-            ->where(function ($query) use ($period) {
-                $query->whereNull('end_date')->orWhereDate('end_date', '>=', $period->copy()->startOfMonth());
+            ->where(function ($query) use ($today) {
+                $query->whereNull('end_date')->orWhereDate('end_date', '>=', $today);
             })
-            ->chunkById(100, function ($enrollments) use ($period, $today, &$created, &$overdue): void {
+            ->chunkById(100, function ($enrollments) use ($today, &$created, &$overdue): void {
                 foreach ($enrollments as $enrollment) {
-                    $dueDate = $period->copy()->day(min($enrollment->due_day, $period->daysInMonth));
+                    $latest = $enrollment->charges()->latest('period')->first();
+                    if ($latest && $latest->status !== 'paid' && $latest->due_date->lt($today)) {
+                        $latest->update(['status' => 'overdue']);
+                        if ($enrollment->status !== 'suspended') {
+                            $enrollment->update(['status' => 'suspended', 'suspended_at' => $today, 'suspension_reason' => 'Recaudo vencido']);
+                            $overdue++;
+                        }
+                        continue;
+                    }
+                    $period = $latest?->period_end?->copy()->addDay() ?? Carbon::parse($enrollment->start_date);
+                    if ($period->gt($today)) {
+                        continue;
+                    }
+                    $periodEnd = app(BillingPeriodService::class)->end($period, $enrollment->billing_frequency ?? 'monthly');
+                    $dueDate = $period->copy();
                     $charge = MonthlyCharge::firstOrCreate(
                         ['enrollment_id' => $enrollment->id, 'period' => $period->toDateString()],
-                        ['club_id' => $enrollment->club_id, 'due_date' => $dueDate->toDateString(), 'amount' => $enrollment->monthly_amount, 'status' => $dueDate->lt($today) ? 'overdue' : 'pending'],
+                        ['club_id' => $enrollment->club_id, 'period_end' => $periodEnd->toDateString(), 'due_date' => $dueDate->toDateString(), 'amount' => $enrollment->monthly_amount, 'status' => $dueDate->lt($today) ? 'overdue' : 'pending'],
                     );
 
                     if ($charge->wasRecentlyCreated) {

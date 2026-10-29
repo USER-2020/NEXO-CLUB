@@ -4,11 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Models\Athlete;
 use App\Models\Club;
+use App\Mail\AthleteAccessMail;
+use App\Mail\AthleteEnrollmentUpdatedMail;
+use App\Services\BillingPeriodService;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -27,10 +32,12 @@ class AthleteController extends Controller
         $query->when($search, fn ($query) => $query->where(fn ($query) => $query->where('first_name', 'like', "%{$search}%")->orWhere('last_name', 'like', "%{$search}%")->orWhere('document_number', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%")->orWhere('phone', 'like', "%{$search}%")));
 
         return Inertia::render('Athletes/Index', [
-            'athletes' => $query->withCount(['enrollments as active_enrollments_count' => fn ($query) => $query->where('status', 'active')])->orderBy('last_name')->orderBy('first_name')->paginate(20)->through(fn (Athlete $athlete) => [
+            'athletes' => $query->with(['enrollments.discipline'])->withCount(['enrollments as active_enrollments_count' => fn ($query) => $query->where('status', 'active')])->orderBy('last_name')->orderBy('first_name')->paginate(20)->through(fn (Athlete $athlete) => [
                 ...$athlete->toArray(),
                 'has_photo' => filled($athlete->photo_path),
+                'current_enrollment' => $athlete->enrollments->sortByDesc('created_at')->first()?->only(['id', 'discipline_id', 'start_date', 'billing_frequency', 'monthly_amount', 'due_day', 'status']),
             ]),
+            'disciplines' => $club->disciplines()->where('is_active', true)->orderBy('name')->get(['id', 'name']),
             'athleteAccess' => session('athleteAccess'),
         ]);
     }
@@ -54,9 +61,34 @@ class AthleteController extends Controller
             'guardian_name' => ['nullable', 'string', 'max:120'],
             'guardian_phone' => ['nullable', 'string', 'max:40'],
             'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'discipline_id' => ['nullable', 'integer', Rule::exists('disciplines', 'id')->where(fn ($query) => $query->where('club_id', $club->id)->where('is_active', true))],
+            'start_date' => ['nullable', 'date'],
+            'billing_frequency' => ['nullable', Rule::in(BillingPeriodService::FREQUENCIES)],
+            'monthly_amount' => ['nullable', 'integer', 'min:0'],
+            'due_day' => ['nullable', 'integer', 'min:1', 'max:31'],
         ]);
+        if (filled($data['discipline_id'] ?? null)) {
+            validator($data, [
+                'start_date' => ['required', 'date'],
+                'billing_frequency' => ['required', Rule::in(BillingPeriodService::FREQUENCIES)],
+                'monthly_amount' => ['required', 'integer', 'min:0'],
+                'due_day' => ['required', 'integer', 'min:1', 'max:31'],
+            ])->validate();
+        }
+        if (filled($data['email'] ?? null)) {
+            $existingUserQuery = User::where('email', $data['email']);
+            if ($athlete->user_id) {
+                $existingUserQuery->whereKeyNot($athlete->user_id);
+            }
+            if ($existingUserQuery->exists()) {
+                return back()->withErrors(['email' => 'Este correo ya pertenece a otra cuenta. Usa otro correo o solicita una vinculación manual.'])->withInput();
+            }
+        }
         $photo = $request->file('photo');
         unset($data['photo']);
+        $enrollmentData = array_intersect_key($data, array_flip(['discipline_id', 'start_date', 'billing_frequency', 'monthly_amount', 'due_day']));
+        $hasEnrollment = filled($enrollmentData['discipline_id'] ?? null);
+        unset($data['discipline_id'], $data['start_date'], $data['billing_frequency'], $data['monthly_amount'], $data['due_day']);
         $existingUser = filled($data['email'] ?? null) ? User::where('email', $data['email'])->first() : null;
         if ($existingUser) {
             return back()->withErrors(['email' => 'Este correo ya tiene una cuenta. Usa otro correo o solicita una vinculación manual.'])->withInput();
@@ -64,7 +96,7 @@ class AthleteController extends Controller
 
         $temporaryPassword = filled($data['email'] ?? null) ? Str::password(12) : null;
 
-        $athlete = DB::transaction(function () use ($club, $data, $photo, $temporaryPassword) {
+        $athlete = DB::transaction(function () use ($club, $data, $photo, $temporaryPassword, $enrollmentData, $hasEnrollment) {
             $user = null;
             if ($temporaryPassword) {
                 $user = User::create([
@@ -92,7 +124,25 @@ class AthleteController extends Controller
                 $athlete->update(['photo_path' => $photo->store("athletes/{$club->id}", 'local')]);
             }
 
-            return $athlete;
+            if ($hasEnrollment) {
+                $startDate = \Carbon\Carbon::parse($enrollmentData['start_date']);
+                $enrollment = $athlete->enrollments()->create([
+                    ...$enrollmentData,
+                    'club_id' => $club->id,
+                    'status' => 'pending',
+                ]);
+                $periodEnd = app(BillingPeriodService::class)->end($startDate, $enrollment->billing_frequency);
+                $enrollment->charges()->create([
+                    'club_id' => $club->id,
+                    'period' => $startDate->toDateString(),
+                    'period_end' => $periodEnd->toDateString(),
+                    'due_date' => $startDate->toDateString(),
+                    'amount' => $enrollment->monthly_amount,
+                    'status' => 'pending',
+                ]);
+            }
+
+            return $athlete->load('club');
         });
 
         $response = back()->with('success', 'Deportista registrado correctamente.');
@@ -102,6 +152,18 @@ class AthleteController extends Controller
                 'email' => $data['email'],
                 'password' => $temporaryPassword,
             ]);
+            if (config('nexo.notifications.enabled')) {
+                try {
+                    Mail::to($data['email'])->send(new AthleteAccessMail(
+                        $athlete,
+                        $temporaryPassword,
+                        $athlete->enrollments()->with(['discipline', 'charges'])->latest()->first(),
+                    ));
+                    $athlete->update(['access_email_sent_at' => now()]);
+                } catch (\Throwable $exception) {
+                    Log::warning('No fue posible enviar el acceso del deportista.', ['athlete_id' => $athlete->id, 'error' => $exception->getMessage()]);
+                }
+            }
         }
 
         return $response;
@@ -128,16 +190,104 @@ class AthleteController extends Controller
             'guardian_name' => ['nullable', 'string', 'max:120'],
             'guardian_phone' => ['nullable', 'string', 'max:40'],
             'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'discipline_id' => ['nullable', 'integer', Rule::exists('disciplines', 'id')->where(fn ($query) => $query->where('club_id', $club->id)->where('is_active', true))],
+            'start_date' => ['nullable', 'date'],
+            'billing_frequency' => ['nullable', Rule::in(BillingPeriodService::FREQUENCIES)],
+            'monthly_amount' => ['nullable', 'integer', 'min:0'],
+            'due_day' => ['nullable', 'integer', 'min:1', 'max:31'],
         ]);
+        if (filled($data['discipline_id'] ?? null)) {
+            validator($data, [
+                'start_date' => ['required', 'date'],
+                'billing_frequency' => ['required', Rule::in(BillingPeriodService::FREQUENCIES)],
+                'monthly_amount' => ['required', 'integer', 'min:0'],
+                'due_day' => ['required', 'integer', 'min:1', 'max:31'],
+            ])->validate();
+        }
         $photo = $request->file('photo');
         unset($data['photo']);
+        $enrollmentData = array_intersect_key($data, array_flip(['discipline_id', 'start_date', 'billing_frequency', 'monthly_amount', 'due_day']));
+        unset($data['discipline_id'], $data['start_date'], $data['billing_frequency'], $data['monthly_amount'], $data['due_day']);
         $athlete->update($data);
+
+        $temporaryPassword = null;
+        $accessCreated = false;
+        if (filled($athlete->email) && filled($enrollmentData['discipline_id'] ?? null)) {
+            $user = $athlete->user;
+            if (! $user) {
+                $temporaryPassword = Str::password(12);
+                $user = User::create([
+                    'name' => trim($athlete->first_name.' '.$athlete->last_name),
+                    'email' => $athlete->email,
+                    'password' => $temporaryPassword,
+                ]);
+                $user->forceFill(['email_verified_at' => now()])->save();
+                $club->users()->attach($user->id, [
+                    'status' => 'active',
+                    'is_default' => false,
+                    'joined_at' => now(),
+                ]);
+                $accessCreated = true;
+            } elseif (! $athlete->access_email_sent_at) {
+                $temporaryPassword = Str::password(12);
+                $user->forceFill(['password' => $temporaryPassword])->save();
+                $accessCreated = true;
+            }
+            app(PermissionRegistrar::class)->setPermissionsTeamId($club->id);
+            $role = Role::firstOrCreate(['name' => 'deportista', 'guard_name' => 'web', 'team_id' => $club->id]);
+            $user->syncRoles([$role]);
+            if ($athlete->user_id !== $user->id) {
+                $athlete->update(['user_id' => $user->id]);
+            }
+        }
 
         if ($photo) {
             $oldPhoto = $athlete->photo_path;
             $athlete->update(['photo_path' => $photo->store("athletes/{$club->id}", 'local')]);
             if ($oldPhoto) {
                 Storage::disk('local')->delete($oldPhoto);
+            }
+        }
+
+        $enrollmentCreated = false;
+        $enrollment = null;
+        if (filled($enrollmentData['discipline_id'] ?? null)) {
+            $enrollment = $athlete->enrollments()->whereIn('status', ['pending', 'active', 'suspended'])->latest()->first();
+            if ($enrollment) {
+                $enrollment->update($enrollmentData);
+            } else {
+                $enrollment = $athlete->enrollments()->create([
+                    ...$enrollmentData,
+                    'club_id' => $club->id,
+                    'status' => 'pending',
+                ]);
+                $enrollmentCreated = true;
+            }
+
+            if (! $enrollment->charges()->exists()) {
+                $startDate = \Carbon\Carbon::parse($enrollment->start_date);
+                $enrollment->charges()->create([
+                    'club_id' => $club->id,
+                    'period' => $startDate->toDateString(),
+                    'period_end' => app(BillingPeriodService::class)->end($startDate, $enrollment->billing_frequency)->toDateString(),
+                    'due_date' => $startDate->copy()->day(min((int) $enrollment->due_day, (int) $startDate->daysInMonth))->toDateString(),
+                    'amount' => $enrollment->monthly_amount,
+                    'status' => 'pending',
+                ]);
+            }
+        }
+
+        if ($enrollmentCreated && $athlete->email && config('nexo.notifications.enabled')) {
+            try {
+                $enrollment = $enrollment?->fresh(['athlete', 'club', 'discipline', 'charges']);
+                if ($accessCreated && $temporaryPassword) {
+                    Mail::to($athlete->email)->send(new AthleteAccessMail($athlete->fresh('club'), $temporaryPassword, $enrollment));
+                    $athlete->update(['access_email_sent_at' => now()]);
+                } elseif (! $accessCreated) {
+                    Mail::to($athlete->email)->send(new AthleteEnrollmentUpdatedMail($enrollment));
+                }
+            } catch (\Throwable $exception) {
+                Log::warning('No fue posible enviar la información de inscripción del deportista.', ['athlete_id' => $athlete->id, 'error' => $exception->getMessage()]);
             }
         }
 

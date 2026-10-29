@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
+import { router } from '@inertiajs/react';
 import { CheckCircle2, LoaderCircle } from 'lucide-react';
 
-export type Operation = 'athlete' | 'enrollment' | 'club' | 'discipline' | 'member' | 'payment_method' | 'payment_submission';
+export type Operation = 'athlete' | 'enrollment' | 'club' | 'club_application' | 'discipline' | 'member' | 'payment_method' | 'payment_submission';
 
 const messages: Record<Operation, { create: string[]; update: string[] }> = {
     athlete: {
@@ -15,6 +16,10 @@ const messages: Record<Operation, { create: string[]; update: string[] }> = {
     club: {
         create: ['Creando club', 'Asociando administrador y configuración', 'Activando espacio deportivo'],
         update: ['Actualizando club', 'Guardando información del espacio', 'Sincronizando configuración'],
+    },
+    club_application: {
+        create: ['Registrando solicitud del club', 'Protegiendo los datos de acceso', 'Enviando solicitud para revisión'],
+        update: ['Actualizando solicitud', 'Guardando información del club', 'Sincronizando revisión'],
     },
     discipline: {
         create: ['Creando disciplina', 'Asociando configuración al club', 'Activando disciplina'],
@@ -47,8 +52,9 @@ export function OperationProgressModal({ operation }: { operation: Operation }) 
 
     const progress = ((phase + 1) / steps.length) * 100;
 
-    return <div className="fixed inset-0 z-[120] flex items-center justify-center bg-nexo-ink/90 p-4 backdrop-blur-md" role="status" aria-live="polite" aria-label={steps[phase]}>
-        <div className="w-full max-w-lg rounded-3xl border border-slate-700 bg-nexo-surface p-7 text-center shadow-2xl shadow-black/60 sm:p-9">
+    return <div className="fixed inset-0 z-[120] flex items-end justify-center bg-nexo-ink/90 p-0 backdrop-blur-md sm:items-center sm:p-4" role="status" aria-live="polite" aria-label={steps[phase]}>
+        <div className="w-full max-w-lg rounded-t-[2rem] border border-slate-700 bg-nexo-surface p-6 text-center shadow-2xl shadow-black/60 sm:rounded-3xl sm:p-9">
+            <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-slate-600 sm:hidden" />
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-nexo-lime/10 text-nexo-lime shadow-lime">
                 <LoaderCircle size={32} className="animate-spin" />
             </div>
@@ -80,6 +86,7 @@ export function GlobalOperationProgressModal() {
             const path = window.location.pathname;
             if (path.includes('/athletes')) return 'athlete';
             if (path.includes('/enrollments')) return 'enrollment';
+            if (path.endsWith('/register') || path === '/register') return 'club_application';
             if (path.includes('/disciplines')) return 'discipline';
             if (path.includes('/club-members')) return 'member';
             if (path.includes('/clubs') || path.includes('/platform')) return 'club';
@@ -92,9 +99,10 @@ export function GlobalOperationProgressModal() {
             const type = label.includes('agregar medio de pago') ? 'payment_method' : detectOperation();
             if (!type) return;
             const finalLabels: Record<Operation, string[]> = {
-                athlete: ['crear deportista'],
+                athlete: ['crear deportista', 'asociar inscripción y recaudo'],
                 enrollment: ['crear inscripción'],
                 club: ['crear club', 'crear club y acceso'],
+                club_application: ['enviar solicitud'],
                 discipline: ['crear disciplina'],
                 member: ['agregar al club'],
                 payment_method: ['agregar medio de pago'],
@@ -127,17 +135,17 @@ export function GlobalOperationProgressModal() {
             }, remaining);
         };
 
+        const removeFinishListener = router.on('finish', handleFinish);
+        const removeErrorListener = router.on('error', handleFinish);
+        const removeExceptionListener = router.on('exception', handleFinish);
         document.addEventListener('submit', handleSubmit, true);
-        document.addEventListener('inertia:finish', handleFinish);
-        document.addEventListener('inertia:error', handleFinish);
-        document.addEventListener('inertia:exception', handleFinish);
 
         return () => {
             if (finishTimerRef.current) window.clearTimeout(finishTimerRef.current);
+            removeFinishListener();
+            removeErrorListener();
+            removeExceptionListener();
             document.removeEventListener('submit', handleSubmit, true);
-            document.removeEventListener('inertia:finish', handleFinish);
-            document.removeEventListener('inertia:error', handleFinish);
-            document.removeEventListener('inertia:exception', handleFinish);
         };
     }, []);
 

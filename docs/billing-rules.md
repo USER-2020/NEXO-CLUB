@@ -8,6 +8,7 @@ Este documento fija las decisiones que deberán respetar las entregas de inscrip
 - La generación de cargos debe ser idempotente y estar protegida por una restricción única.
 - `billing:generate-monthly-charges` crea un cargo por inscripción y período mediante la restricción única `enrollment_id + period`.
 - Al activar una inscripción con fecha de inicio vigente, `EnrollmentController` crea inmediatamente el cargo del mes actual; la generación diaria cubre los periodos posteriores.
+- El primer pago de una inscripción pendiente fija el inicio del período en la fecha real de registro/aprobación del pago. El siguiente cobro se calcula desde esa fecha según `monthly`, `biweekly`, `quarterly`, `semiannual` o `annual`; no se muestra nuevamente la fecha del cargo inicial pagado.
 - Un cargo vencido no pagado marca la inscripción como `suspended`; registrar el pago puede reactivarla.
 - Los pagos parciales se distribuyen mediante asignaciones y nunca pueden superar el saldo disponible.
 - Los pagos confirmados no se eliminan físicamente; las anulaciones y correcciones se auditan.
@@ -27,7 +28,7 @@ La activación no depende del scheduler para mostrar el primer cargo. Para una i
 - `NEXO_NOTIFICATIONS_ENABLED=false` evita envíos mientras no exista SMTP configurado.
 - Al activarse, una inscripción puede enviar correo de bienvenida al deportista.
 - `billing:send-notifications` envía recordatorio un día antes y aviso el día del vencimiento.
-- El mismo comando envía a los administradores un CSV diario de pendientes únicamente cuando existen cargos pendientes o vencidos.
+- El mismo comando envía a los administradores un Excel diario únicamente cuando existen cargos pendientes o vencidos; cada fila incluye deportista, disciplina, período, vencimiento, valor y estado.
 - El scheduler ejecuta este comando diariamente a las 08:00.
 - Los correos incluyen enlaces absolutos a `/login` y `/mensualidades`. La aplicación muestra allí las cuentas bancarias, Nequi y llaves autorizadas; nunca se incluyen credenciales bancarias en la URL ni en parámetros del correo.
 

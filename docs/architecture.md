@@ -15,6 +15,8 @@ NEXO CLUB será un monolito modular Laravel + Inertia + React/TypeScript. La apl
 - **Notifications:** notificaciones internas, correo, colas y trazabilidad de entregas.
 - **Reporting:** cartera, exportaciones y métricas limitadas al club activo.
 - **Guided tours:** recorridos contextuales Driver.js para cada componente Inertia autenticado. La finalización se guarda por usuario y módulo en `guided_tours`.
+- **Guided tour contract:** cada módulo debe declarar su componente Inertia, roles, clave estable, objetivos `data-tour`, pasos del flujo real y video Hyperframe cuando forme parte del catálogo. La guía debe cubrir sus acciones y estados reales, no solo mostrar una plantilla visual genérica.
+- **Club applications:** el registro público crea una solicitud pendiente y una cuenta inactiva. Solo el superadmin puede aprobarla; al aprobar se crea el club, se asigna el administrador principal y se activa la cuenta.
 
 ## Aislamiento multi-club
 
@@ -34,7 +36,7 @@ La generación mensual se ejecuta con Scheduler y es idempotente mediante una re
 
 ## PWA y privacidad
 
-La PWA precachea recursos estáticos y no almacena datos financieros ni perfiles sensibles en cachés públicos. El MVP no habilita operaciones financieras offline. La infraestructura de correo de bienvenida, recordatorios de vencimiento y reportes CSV diarios está preparada, pero permanece desactivada hasta configurar SMTP y activar explícitamente `NEXO_NOTIFICATIONS_ENABLED=true`; Reverb/WebSockets queda como una extensión posterior.
+La PWA precachea recursos estáticos y no almacena datos financieros ni perfiles sensibles en cachés públicos. El MVP no habilita operaciones financieras offline. La infraestructura de correo de bienvenida, recordatorios de vencimiento y reportes Excel diarios está preparada, pero permanece desactivada hasta configurar SMTP y activar explícitamente `NEXO_NOTIFICATIONS_ENABLED=true`; Reverb/WebSockets queda como una extensión posterior.
 
 ## Decisiones iniciales
 
@@ -44,9 +46,11 @@ La PWA precachea recursos estáticos y no almacena datos financieros ni perfiles
 - Cada club puede registrar varios medios de pago en `club_payment_methods`: cuentas bancarias, Nequi, Bre-B y llaves. Los registros pertenecen al club activo y pueden activarse o desactivarse.
 - Los campos sensibles de `club_payment_methods` (`account_number`, `account_holder`, `holder_document`) se cifran en reposo. El rol `admin` los gestiona y visualiza completos; `superadmin` solo ve una representación enmascarada, como `****12`.
 - La infraestructura de correos está preparada pero apagada por defecto con `NEXO_NOTIFICATIONS_ENABLED=false`; requiere SMTP antes de activarse.
+- Las solicitudes públicas de club viven en `club_applications`. Con las notificaciones habilitadas, el solicitante recibe confirmación de recepción y, después de la aprobación, un correo de activación con el enlace de acceso.
 - Los comprobantes se guardan en el disco privado local (`storage/app/private`) y solo se descargan mediante rutas autenticadas del deportista propietario o del equipo autorizado del club. Aprobar un comprobante crea el `payment`, marca el cargo como pagado y reactiva una inscripción suspendida dentro de una transacción.
 - La zona horaria del club se conserva como dato configurable para soportar posteriormente clubes en distintas regiones.
 - La vista guiada no usa almacenamiento local como fuente de verdad. `GuidedTour` identifica la página Inertia activa, muestra el botón flotante con `HelpCircle` y registra la bandera mediante `POST /guided-tours/{tourKey}/complete`; la tabla tiene unicidad por usuario y clave de módulo.
+- Los módulos nuevos aplican `skills/nexo-club-guided-tours/SKILL.md`: registran una clave única, objetivos específicos, pasos por rol cuando sea necesario y validan la guía con la pantalla vacía, cargada, validada y confirmada. Los objetivos que no existan por permisos o colecciones vacías se omiten de forma segura.
 - El dashboard de cada rol (`Dashboard`, `Platform/Dashboard` y `Athletes/Portal`) inicia su tour automáticamente cuando la clave aún no está completada. El botón flotante permanece disponible para repetir cualquier tour.
 - La política de cobro de inscripciones a mitad de mes se decidirá antes del módulo de facturación y se persistirá en la configuración del club.
 - Las fotos privadas no se publican mediante `storage:link`; una ruta autenticada verifica sesión y club activo antes de entregar el archivo.

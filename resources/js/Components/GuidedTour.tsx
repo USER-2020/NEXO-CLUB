@@ -7,6 +7,7 @@ import type { User } from '@/types';
 import 'driver.js/dist/driver.css';
 
 type PageProps = { auth: { user: User }; guidedTours?: string[] };
+type TourStep = { target: string; title: string; description: string };
 
 const tours: Record<string, { key: string; title: string; description: string }> = {
     Dashboard: { key: 'dashboard', title: 'Resumen del club', description: 'Consulta los indicadores y la actividad principal de tu club.' },
@@ -26,6 +27,114 @@ const tours: Record<string, { key: string; title: string; description: string }>
     'FlowDocumentation/Index': { key: 'documentation', title: 'Centro de documentación', description: 'Encuentra los flujos visuales disponibles para tu rol.' },
 };
 
+const flowSteps: Record<string, TourStep[]> = {
+    Dashboard: [
+        { target: 'dashboard-kpis', title: 'Indicadores del club', description: 'Consulta aquí los deportistas, inscripciones y cobros que requieren atención.' },
+        { target: 'dashboard-action', title: 'Siguiente acción', description: 'Usa esta acción para completar la configuración inicial del club.' },
+    ],
+    'Platform/Dashboard': [
+        { target: 'platform-metrics', title: 'Indicadores globales', description: 'Supervisa la cantidad de clubes, usuarios y actividad de toda la plataforma.' },
+        { target: 'platform-clubs-link', title: 'Gestionar clubes', description: 'Desde aquí puedes revisar solicitudes y administrar clubes y administradores.' },
+    ],
+    'Platform/Clubs': [
+        { target: 'platform-applications', title: 'Solicitudes pendientes', description: 'Revisa y aprueba solicitudes verificadas para crear el club y activar a su administrador.' },
+        { target: 'platform-clubs-list', title: 'Clubes registrados', description: 'Consulta el estado de los clubes y abre su detalle operativo.' },
+        { target: 'platform-create-club', title: 'Crear club', description: 'Crea un club y su administrador principal cuando el flujo corresponda.' },
+    ],
+    'Platform/ClubDetails': [
+        { target: 'platform-club-summary', title: 'Detalle del club', description: 'Consulta la información y el estado del club seleccionado.' },
+        { target: 'platform-club-members', title: 'Administradores', description: 'Revisa los administradores asociados al club y retira accesos cuando corresponda.' },
+        { target: 'platform-add-admin', title: 'Agregar administrador', description: 'Crea o vincula un administrador al club desde este formulario.' },
+    ],
+    'Platform/AuditLogs': [
+        { target: 'audit-history', title: 'Historial auditable', description: 'Consulta accesos y operaciones con actor, club, fecha y detalle del cambio.' },
+    ],
+    'Athletes/Index': [
+        { target: 'athletes-create', title: 'Crear deportista', description: 'Inicia el registro del perfil permanente del deportista y, si corresponde, su inscripción.' },
+        { target: 'athletes-list', title: 'Perfiles del club', description: 'Consulta perfiles, estado, disciplina y acceso de cada deportista.' },
+        { target: 'athletes-form', title: 'Formulario guiado', description: 'El modal organiza los datos personales, contacto, información física e inscripción.' },
+    ],
+    'Enrollments/Index': [
+        { target: 'enrollments-create', title: 'Crear inscripción', description: 'Asocia un deportista con una disciplina y configura sus condiciones de cobro.' },
+        { target: 'enrollments-list', title: 'Ciclo de inscripción', description: 'Consulta el estado y las fechas de cada inscripción del club.' },
+        { target: 'enrollment-billing', title: 'Periodicidad y valor', description: 'Define la fecha de inicio, periodicidad, valor del período y día de vencimiento.' },
+    ],
+    'Memberships/Index': [
+        { target: 'billing-charges', title: 'Cargos del club', description: 'Consulta los cobros pendientes, vencidos y pagados de las inscripciones activas.' },
+        { target: 'billing-payment', title: 'Registrar pago', description: 'Registra el pago recibido y reactiva una inscripción pendiente o suspendida cuando corresponda.' },
+        { target: 'billing-submissions', title: 'Comprobantes', description: 'Revisa los comprobantes enviados por los deportistas y decide si aprobarlos o rechazarlos.' },
+    ],
+    'Clubs/Index': [
+        { target: 'clubs-list', title: 'Club activo', description: 'Consulta los clubes disponibles y reconoce cuál está activo para la operación.' },
+        { target: 'club-settings', title: 'Configuración del club', description: 'Actualiza la información visible del club y su zona horaria.' },
+        { target: 'club-payment-methods', title: 'Medios de pago', description: 'Registra cuentas, Nequi, Bre-B o llaves para que los deportistas sepan dónde pagar.' },
+    ],
+    'Disciplines/Index': [
+        { target: 'disciplines-list', title: 'Disciplinas disponibles', description: 'Las disciplinas activas aparecen como opciones al crear inscripciones.' },
+        { target: 'discipline-form', title: 'Crear o editar disciplina', description: 'Registra el nombre y la descripción; luego puedes activar o desactivar la disciplina.' },
+    ],
+    'ClubMembers/Index': [
+        { target: 'members-list', title: 'Equipo del club', description: 'Consulta los usuarios operativos y sus estados y roles.' },
+        { target: 'member-create', title: 'Agregar miembro', description: 'Crea o vincula un usuario operativo y asigna su rol dentro del club.' },
+    ],
+    'Athletes/Portal': [
+        { target: 'athlete-portal-summary', title: 'Tu portal', description: 'Consulta tu información personal, estado de acceso e indicadores disponibles.' },
+        { target: 'athlete-portal-enrollments', title: 'Tus inscripciones', description: 'Revisa la vigencia, cargos y estado de pago de tus inscripciones.' },
+    ],
+    'Athletes/Payments': [
+        { target: 'athlete-payments-charges', title: 'Cargos y comprobantes', description: 'Selecciona una mensualidad pendiente para revisar su vencimiento y enviar el comprobante.' },
+        { target: 'athlete-payment-upload', title: 'Enviar comprobante', description: 'Selecciona el medio usado, agrega una referencia opcional y adjunta el comprobante.' },
+    ],
+    'Profile/Edit': [
+        { target: 'profile-form', title: 'Datos personales', description: 'Actualiza tu nombre, correo y contraseña desde tu perfil.' },
+    ],
+    'FlowDocumentation/Index': [
+        { target: 'documentation-filters', title: 'Filtrar flujos', description: 'Busca la guía por rol o módulo usando los filtros disponibles.' },
+        { target: 'documentation-video', title: 'Recorrido visual', description: 'Reproduce el video general o el recorrido individual cuando ya esté publicado.' },
+    ],
+};
+
+const textTargets: Record<string, string> = {
+    'dashboard-action': 'Configurar club',
+    'platform-clubs-link': 'Gestionar clubes',
+    'platform-create-club': 'Crear club',
+    'athletes-create': 'Crear deportista',
+    'enrollments-create': 'Crear inscripción',
+    'billing-payment': 'Registrar pago',
+    'club-payment-methods': 'Agregar medio de pago',
+    'member-create': 'Agregar al club',
+};
+
+const selectorTargets: Record<string, string> = {
+    'dashboard-kpis': 'main section > div:nth-child(2)',
+    'platform-metrics': 'main section > div:nth-child(2)',
+    'platform-applications': 'main section > section',
+    'platform-clubs-list': 'main section > div:last-child',
+    'platform-club-summary': 'main section > div:nth-child(2)',
+    'platform-club-members': 'main section > div:nth-child(3)',
+    'platform-add-admin': 'main form',
+    'audit-history': 'main section .nexo-card',
+    'athletes-list': 'main section .nexo-card',
+    'athletes-form': '[role="dialog"]',
+    'enrollments-list': 'main section .nexo-card',
+    'enrollment-billing': '[role="dialog"]',
+    'billing-charges': 'main section .nexo-card:last-child',
+    'billing-submissions': 'main section .nexo-card:last-child',
+    'clubs-list': 'main section > div:nth-child(2)',
+    'club-settings': 'main form',
+    'club-payment-methods': 'main form',
+    'disciplines-list': 'main section .nexo-card',
+    'discipline-form': '#discipline-form',
+    'members-list': 'main section .nexo-card',
+    'athlete-portal-summary': 'main section',
+    'athlete-portal-enrollments': 'main section .nexo-card',
+    'athlete-payments-charges': 'main section .nexo-card',
+    'athlete-payment-upload': 'main form',
+    'profile-form': 'main form',
+    'documentation-filters': 'main section > div:nth-child(2)',
+    'documentation-video': 'main section .nexo-card',
+};
+
 export default function GuidedTour() {
     const { component, props } = usePage<PageProps>();
     const tour = useMemo(() => tours[component], [component]);
@@ -38,11 +147,29 @@ export default function GuidedTour() {
 
     const start = useCallback(() => {
         if (!tour) return;
-        const visibleTarget = (name: string) => Array.from(document.querySelectorAll(`[data-tour="${name}"]`)).find((element) => { const rect = element.getBoundingClientRect(); return rect.width > 0 && rect.height > 0; });
+        const visibleTarget = (name: string) => {
+            const isVisible = (element: Element | null | undefined) => {
+                if (!element) return false;
+                const rect = element.getBoundingClientRect();
+                return rect.width > 0 && rect.height > 0;
+            };
+            const marked = Array.from(document.querySelectorAll(`[data-tour="${name}"]`)).find(isVisible);
+            if (marked) return marked;
+
+            const text = textTargets[name];
+            if (text) {
+                const match = Array.from(document.querySelectorAll('button, a')).find((element) => isVisible(element) && element.textContent?.trim().includes(text));
+                if (match) return match;
+            }
+
+            const fallback = selectorTargets[name] ? document.querySelector(selectorTargets[name]) : undefined;
+            return fallback && isVisible(fallback) ? fallback : undefined;
+        };
         const steps = [
             { element: visibleTarget('module-nav'), popover: { title: 'Módulo activo', description: `Estás en ${tour.title}. Desde la navegación puedes cambiar de módulo.` } },
             { element: visibleTarget('module-header'), popover: { title: tour.title, description: tour.description } },
             { element: visibleTarget('module-content'), popover: { title: 'Área de trabajo', description: 'Aquí encontrarás la información, acciones y estados propios de este módulo.' } },
+            ...(flowSteps[component] ?? []).map((step) => ({ element: visibleTarget(step.target), popover: { title: step.title, description: step.description } })),
         ].filter((step) => step.element);
 
         if (!steps.length) return;

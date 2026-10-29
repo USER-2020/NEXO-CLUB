@@ -47,11 +47,15 @@ type CreatedAccess = {
     existing: boolean;
 } | null;
 
+type Application = { id: number; applicant: { name: string; email: string }; email_verified_at?: string | null; club_name: string; club_email: string; club_phone: string; club_address: string; club_city: string; club_timezone: string; created_at: string };
+
 export default function Clubs({
     clubs: paginatedClubs,
+    applications,
     createdAccess,
 }: {
     clubs: { data: Club[]; current_page: number; last_page: number; from?: number; to?: number; total?: number };
+    applications: Application[];
     createdAccess?: CreatedAccess;
 }) {
     const clubs = paginatedClubs.data;
@@ -89,6 +93,22 @@ export default function Clubs({
     const openClub = (club: Club) => {
         router.get(route('platform.clubs.show', club.id));
     };
+
+    const resendVerification = (application: Application) => router.post(route('platform.club-applications.resend-verification', application.id), {}, { preserveScroll: true });
+    const approveApplication = (application: Application) => {
+        if (!application.email_verified_at) {
+            confirmToast({
+                title: 'Correo pendiente de confirmación',
+                description: `El solicitante aún no confirmó ${application.applicant.email}. Puedes reenviar el enlace de verificación.`,
+                confirmLabel: 'Reenviar correo',
+                onConfirm: () => resendVerification(application),
+            });
+            return;
+        }
+
+        router.patch(route('platform.club-applications.approve', application.id), {}, { preserveScroll: true });
+    };
+    const rejectApplication = (application: Application) => confirmToast({ title: `¿Rechazar ${application.club_name}?`, description: 'La cuenta quedará bloqueada y no se creará el club.', confirmLabel: 'Rechazar solicitud', onConfirm: () => router.patch(route('platform.club-applications.reject', application.id), {}, { preserveScroll: true }) });
 
     return (
         <PlatformLayout
@@ -137,6 +157,8 @@ export default function Clubs({
                         </div>
                     </div>
                 )}
+
+                {applications.length > 0 && <section className="mb-8 rounded-2xl border border-amber-300/20 bg-amber-300/5 p-5 sm:p-6"><div className="flex items-start justify-between gap-4"><div><p className="nexo-eyebrow text-amber-300">Pendientes de aprobación</p><h2 className="mt-1 text-xl font-bold">Solicitudes públicas</h2><p className="mt-1 text-sm text-slate-400">Revisa los datos antes de habilitar la cuenta y crear el club.</p></div><span className="rounded-full bg-amber-300/10 px-3 py-1 text-sm font-bold text-amber-200">{applications.length}</span></div><div className="mt-5 grid gap-4 lg:grid-cols-2">{applications.map((application) => <div key={application.id} className="rounded-2xl border border-slate-700 bg-nexo-surface p-5"><div className="flex items-start justify-between gap-3"><div><h3 className="font-bold">{application.club_name}</h3><p className="mt-1 text-sm text-slate-400">Solicitante: {application.applicant.name} · {application.applicant.email}</p></div><span className="text-xs text-slate-500">{formatAppDate(application.created_at)}</span></div><div className="mt-4 grid gap-1 text-sm text-slate-400 sm:grid-cols-2"><p>{application.club_email}</p><p>{application.club_phone}</p><p className="sm:col-span-2">{application.club_address}, {application.club_city}</p></div><div className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-slate-800 bg-slate-900/40 px-3 py-2 text-xs"><span className={application.email_verified_at ? 'text-emerald-300' : 'text-amber-200'}>{application.email_verified_at ? 'Correo confirmado' : 'Correo pendiente de confirmación'}</span>{!application.email_verified_at && <button type="button" onClick={() => resendVerification(application)} className="min-h-9 rounded-lg border border-amber-300/30 px-3 font-semibold text-amber-200 hover:bg-amber-300/10">Reenviar correo</button>}</div><div className="mt-5 flex flex-wrap justify-end gap-2"><button type="button" onClick={() => rejectApplication(application)} className="min-h-11 rounded-xl border border-red-400/20 px-4 py-2 text-sm font-semibold text-red-300 hover:bg-red-400/10">Rechazar</button><button type="button" onClick={() => approveApplication(application)} className="min-h-11 rounded-xl bg-nexo-lime px-4 py-2 text-sm font-bold text-nexo-ink shadow-lime">Aprobar y crear club</button></div></div>)}</div></section>}
 
                 <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
                     <div className="grid items-start gap-4 md:grid-cols-2">

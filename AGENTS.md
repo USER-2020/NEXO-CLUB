@@ -55,11 +55,13 @@ Antes de crear un formulario nuevo, revisar `docs/agent-context.md` y reutilizar
 - Las operaciones `UPDATE`, `DELETE` y cambios de estado, incluidas las iniciadas con `router.patch` o `router.delete`, deben usar `react-hot-toast` y `confirmToast` cuando requieran confirmación; no deben abrir el loader de INSERT.
 - Para un INSERT, verificar el orden: clic del usuario → loader específico → respuesta backend → cierre del loader → Toast de éxito/error. Para `UPDATE`, `DELETE` o cambios de estado: clic → confirmación si aplica → respuesta backend → Toast.
 
-## Reglas de mensualidades
+## Reglas de recaudos y acceso de deportistas
 
-- Una inscripción empieza en `pending`; al activarla se crea inmediatamente el cargo del periodo actual si su fecha de inicio ya llegó.
-- El día de vencimiento se calcula inicialmente con el día de inicio, pero el usuario puede modificarlo del 1 al 31.
-- `billing:generate-monthly-charges` es idempotente, corre diariamente a las 00:10 y no debe crear cargos antes de `start_date`.
+- Una inscripción empieza en `pending`; el alta guiada puede crear también su primer recaudo.
+- Las periodicidades admitidas son `monthly`, `biweekly`, `quarterly`, `semiannual` y `annual`; el importe representa el valor de ese periodo.
+- El acceso del deportista requiere usuario activo, deportista activo, inscripción activa y un recaudo pagado cuyo `period_end` cubra la fecha actual.
+- `billing:generate-monthly-charges` conserva su nombre por compatibilidad, pero genera el siguiente recaudo según `billing_frequency`, es idempotente, corre diariamente a las 00:10 y no crea cargos antes de `start_date`.
+- El día siguiente al vencimiento de un recaudo impago suspende la inscripción; aprobar o registrar el pago reactiva una inscripción pendiente o suspendida.
 
 ### Ejemplo de componentes
 
@@ -106,8 +108,11 @@ php artisan migrate:fresh --seed
 ## Vista guiada por módulo
 
 - La vista guiada usa `driver.js` y se monta globalmente desde `resources/js/app.tsx` mediante `GuidedTour`.
+- Todo módulo nuevo o flujo operativo nuevo debe aplicar [skills/nexo-club-guided-tours/SKILL.md](skills/nexo-club-guided-tours/SKILL.md), además de leer `docs/agent-context.md` y esta sección antes de implementarlo.
 - El botón flotante de ayuda debe permanecer disponible en los layouts autenticados y de plataforma. Su etiqueta accesible y visible al hover es `Visita guiada`.
 - Las guías se resuelven por el nombre del componente Inertia activo y no deben mostrar pasos de otro módulo. Los objetivos compartidos usan `data-tour="module-nav"`, `data-tour="module-header"` y `data-tour="module-content"`.
+- Cada módulo debe registrar una clave estable en `GuidedTour.tsx` y definir pasos basados en su flujo real: contexto, acción principal, captura/validación, carga o confirmación y resultado cuando existan. Los objetivos específicos deben usar `data-tour` semánticos y no selectores ficticios.
+- Si una vista cambia materialmente por rol, debe definir pasos separados o filtrar los pasos según el rol; no reutilizar una guía de administrador para superadmin o deportista.
 - El estado de finalización se guarda en `guided_tours`, asociado a `user_id` y `tour_key`; no usar `localStorage` como fuente de verdad.
 - La guía del dashboard por rol se abre automáticamente la primera vez que el usuario entra si aún no está completada. Después puede repetirse desde el botón flotante `Visita guiada` en cualquier módulo disponible.
 - El backend comparte las claves completadas mediante Inertia y el endpoint `guided-tours.complete` valida que solo el usuario autenticado pueda marcar su propia guía.

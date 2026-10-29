@@ -26,6 +26,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'is_active',
     ];
 
     /**
@@ -48,6 +49,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
         ];
     }
 
@@ -69,5 +71,10 @@ class User extends Authenticatable
     public function guidedTours(): HasMany
     {
         return $this->hasMany(GuidedTour::class);
+    }
+
+    public function clubApplications(): HasMany
+    {
+        return $this->hasMany(ClubApplication::class);
     }
 }

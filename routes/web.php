@@ -10,6 +10,7 @@ use App\Http\Controllers\DisciplineController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\GuidedTourController;
 use App\Http\Controllers\PlatformAuditController;
+use App\Http\Controllers\PlatformClubApplicationController;
 use App\Http\Controllers\PlatformClubController;
 use App\Http\Controllers\PlatformDashboardController;
 use App\Http\Controllers\ProfileController;
@@ -69,6 +70,9 @@ Route::middleware(['auth', 'verified', 'platform.admin'])->prefix('platform')->g
     Route::get('/logs', [PlatformAuditController::class, 'index'])->name('platform.logs.index');
     Route::get('/clubs/{club}', [PlatformClubController::class, 'show'])->name('platform.clubs.show');
     Route::post('/clubs', [PlatformClubController::class, 'store'])->name('platform.clubs.store');
+    Route::patch('/club-applications/{application}/approve', [PlatformClubApplicationController::class, 'approve'])->name('platform.club-applications.approve');
+    Route::post('/club-applications/{application}/resend-verification', [PlatformClubApplicationController::class, 'resendVerification'])->name('platform.club-applications.resend-verification');
+    Route::patch('/club-applications/{application}/reject', [PlatformClubApplicationController::class, 'reject'])->name('platform.club-applications.reject');
     Route::post('/clubs/{club}/administrators', [PlatformClubController::class, 'addAdmin'])->name('platform.clubs.admins.store');
     Route::delete('/clubs/{club}/administrators/{user}', [PlatformClubController::class, 'removeAdmin'])->name('platform.clubs.admins.destroy');
     Route::patch('/clubs/{club}/status', [PlatformClubController::class, 'toggle'])->name('platform.clubs.toggle');

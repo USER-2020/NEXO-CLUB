@@ -32,6 +32,10 @@
 - [x] Centro global de documentación por rol, módulo y componente, con filtros y un recorrido general más 10 Hyperframes individuales renderizados.
 - [x] Vista guiada contextual con Driver.js, botón flotante `Visita guiada`, recorridos para todos los módulos autenticados y persistencia de finalización por usuario y módulo.
 - [x] Hyperframes dinámicos sin Playwright: cursor, escritura progresiva, validación, loader, actualización de estados y toast de confirmación en los 10 recorridos individuales.
+- [x] Contrato reutilizable para módulos futuros: skill `nexo-club-guided-tours`, reglas de AGENTS y arquitectura para guías Driver.js específicas por contenido, rol, flujo y estado.
+- [x] Registro público de clubes con datos esenciales, cuenta inactiva y solicitud pendiente de aprobación.
+- [x] Flujo de superadmin para aprobar/rechazar solicitudes; la aprobación crea el club y activa al administrador principal.
+- [x] Correos de recepción y activación de solicitudes de club, condicionados a `NEXO_NOTIFICATIONS_ENABLED=true` y SMTP configurado.
 
 ## Siguiente fase
 

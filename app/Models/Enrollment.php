@@ -13,12 +13,18 @@ class Enrollment extends Model
 
     protected $fillable = [
         'club_id', 'athlete_id', 'discipline_id', 'start_date', 'end_date',
-        'monthly_amount', 'due_day', 'status', 'suspended_at', 'suspension_reason',
+        'monthly_amount', 'billing_frequency', 'due_day', 'status', 'suspended_at', 'suspension_reason',
     ];
 
     protected function casts(): array
     {
-        return ['start_date' => 'date', 'end_date' => 'date', 'suspended_at' => 'datetime'];
+        return [
+            'start_date' => 'date',
+            'end_date' => 'date',
+            'suspended_at' => 'datetime',
+            'monthly_amount' => 'integer',
+            'due_day' => 'integer',
+        ];
     }
 
     public function club(): BelongsTo

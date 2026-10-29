@@ -14,7 +14,7 @@ class Athlete extends Model
     protected $fillable = [
         'club_id', 'user_id', 'first_name', 'last_name', 'document_type', 'document_number', 'birth_date',
         'height_cm', 'weight_kg', 'shirt_size', 'shoe_size', 'photo_path',
-        'phone', 'email', 'guardian_name', 'guardian_phone', 'status',
+        'phone', 'email', 'guardian_name', 'guardian_phone', 'status', 'access_email_sent_at',
     ];
 
     protected function casts(): array
@@ -23,6 +23,7 @@ class Athlete extends Model
             'birth_date' => 'date',
             'height_cm' => 'decimal:2',
             'weight_kg' => 'decimal:2',
+            'access_email_sent_at' => 'datetime',
         ];
     }
 

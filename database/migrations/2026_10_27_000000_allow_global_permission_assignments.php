@@ -10,6 +10,15 @@ return new class extends Migration
     {
         foreach (['model_has_roles', 'model_has_permissions'] as $tableName) {
             if (Schema::hasColumn($tableName, 'team_id')) {
+                $hasPrimaryKey = collect(Schema::getIndexes($tableName))
+                    ->contains(fn (array $index): bool => (bool) ($index['primary'] ?? false));
+
+                if ($hasPrimaryKey) {
+                    Schema::table($tableName, function (Blueprint $table): void {
+                        $table->dropPrimary();
+                    });
+                }
+
                 Schema::table($tableName, function (Blueprint $table) {
                     $table->unsignedBigInteger('team_id')->nullable()->change();
                 });

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Club;
+use App\Models\ClubApplication;
 use App\Models\User;
 use App\Services\AuditLogger;
 use Illuminate\Http\RedirectResponse;
@@ -28,6 +29,18 @@ class PlatformClubController extends Controller
 
         return Inertia::render('Platform/Clubs', [
             'clubs' => $clubs,
+            'applications' => ClubApplication::with('user:id,name,email,email_verified_at')->where('status', 'pending')->latest()->get()->map(fn (ClubApplication $application) => [
+                'id' => $application->id,
+                'applicant' => $application->user->only(['name', 'email']),
+                'email_verified_at' => $application->user->email_verified_at,
+                'club_name' => $application->club_name,
+                'club_email' => $application->club_email,
+                'club_phone' => $application->club_phone,
+                'club_address' => $application->club_address,
+                'club_city' => $application->club_city,
+                'club_timezone' => $application->club_timezone,
+                'created_at' => $application->created_at,
+            ])->values(),
             'createdAccess' => session('createdAccess'),
         ]);
     }

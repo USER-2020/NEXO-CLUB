@@ -10,6 +10,8 @@ import { registerSW } from 'virtual:pwa-register';
 import { Toaster } from 'react-hot-toast';
 import { GlobalOperationProgressModal } from '@/Components/OperationProgressModal';
 import GuidedTour from '@/Components/GuidedTour';
+import ModalSwipeController from '@/Components/ModalSwipeController';
+import AdminBillingNotifications from '@/Components/AdminBillingNotifications';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -32,10 +34,12 @@ createInertiaApp({
                         <>
                             <Component {...pageProps} key={key} />
                             <GuidedTour />
+                            <AdminBillingNotifications />
                         </>
                     )}
                 </App>
                 <GlobalOperationProgressModal />
+                <ModalSwipeController />
                 <Toaster
                     position="top-center"
                     toastOptions={{

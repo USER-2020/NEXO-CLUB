@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Club;
 use App\Models\Enrollment;
 use App\Mail\EnrollmentActivatedMail;
+use App\Services\BillingPeriodService;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -40,9 +41,10 @@ class EnrollmentController extends Controller
             'discipline_id' => ['required', 'integer', Rule::exists('disciplines', 'id')->where(fn ($query) => $query->where('club_id', $club->id)->where('is_active', true))],
             'start_date' => ['required', 'date'],
             'monthly_amount' => ['required', 'integer', 'min:0'],
+            'billing_frequency' => ['nullable', Rule::in(BillingPeriodService::FREQUENCIES)],
             'due_day' => ['required', 'integer', 'min:1', 'max:31'],
         ]);
-        $club->enrollments()->create([...$data, 'status' => 'pending']);
+        $club->enrollments()->create([...$data, 'billing_frequency' => $data['billing_frequency'] ?? 'monthly', 'status' => 'pending']);
 
         return back()->with('success', 'Inscripción creada como pendiente de activación.');
     }
@@ -65,13 +67,14 @@ class EnrollmentController extends Controller
             $startDate = Carbon::parse($enrollment->start_date);
 
             if ($startDate->lte($today)) {
-                $period = $today->copy()->startOfMonth();
+                $period = $startDate;
                 $dueDate = $period->copy()->day(min($enrollment->due_day, $period->daysInMonth));
 
                 $enrollment->charges()->firstOrCreate(
                     ['period' => $period->toDateString()],
                     [
                         'club_id' => $enrollment->club_id,
+                        'period_end' => app(BillingPeriodService::class)->end($period, $enrollment->billing_frequency)->toDateString(),
                         'due_date' => $dueDate->toDateString(),
                         'amount' => $enrollment->monthly_amount,
                         'status' => $dueDate->lt($today) ? 'overdue' : 'pending',
@@ -102,9 +105,10 @@ class EnrollmentController extends Controller
             'discipline_id' => ['required', 'integer', Rule::exists('disciplines', 'id')->where(fn ($query) => $query->where('club_id', $club->id)->where('is_active', true))],
             'start_date' => ['required', 'date'],
             'monthly_amount' => ['required', 'integer', 'min:0'],
+            'billing_frequency' => ['nullable', Rule::in(BillingPeriodService::FREQUENCIES)],
             'due_day' => ['required', 'integer', 'min:1', 'max:31'],
         ]);
-        $enrollment->update($data);
+        $enrollment->update([...$data, 'billing_frequency' => $data['billing_frequency'] ?? $enrollment->billing_frequency ?? 'monthly']);
 
         return back()->with('success', 'Inscripción actualizada correctamente.');
     }

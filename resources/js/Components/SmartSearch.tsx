@@ -25,7 +25,9 @@ export default function SmartSearch() {
         const timer = window.setTimeout(() => {
             const current = new URLSearchParams(window.location.search).get('q') ?? '';
             if (value.trim() === current) return;
-            router.get(window.location.pathname, value.trim() ? { q: value.trim() } : {}, { preserveState: true, preserveScroll: true, replace: true });
+            const params = new URLSearchParams(window.location.search);
+            if (value.trim()) params.set('q', value.trim()); else params.delete('q');
+            router.get(`${window.location.pathname}${params.toString() ? `?${params.toString()}` : ''}`, {}, { preserveState: true, preserveScroll: true, replace: true });
         }, 350);
         return () => window.clearTimeout(timer);
     }, [value, searchable]);

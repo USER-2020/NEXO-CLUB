@@ -5,7 +5,7 @@ import { Bell, BookOpen, ChevronDown, CircleDollarSign, Dumbbell, FileText, Home
 import { PropsWithChildren, ReactNode, RefObject, useEffect, useRef, useState } from 'react';
 
 const navigation = [
-    { label: 'Resumen', href: 'dashboard', icon: Home }, { label: 'Deportistas', href: 'athletes.index', icon: Users }, { label: 'Disciplinas', href: 'disciplines.index', icon: Dumbbell }, { label: 'Inscripciones', href: 'enrollments.index', icon: FileText }, { label: 'Mensualidades', href: 'memberships.index', icon: CircleDollarSign }, { label: 'Configuración', href: 'clubs.index', icon: Settings }, { label: 'Equipo', href: 'club-members.index', icon: UserCog }, { label: 'Flujos', href: 'flow-docs.index', icon: BookOpen },
+    { label: 'Resumen', href: 'dashboard', icon: Home }, { label: 'Deportistas', href: 'athletes.index', icon: Users }, { label: 'Disciplinas', href: 'disciplines.index', icon: Dumbbell }, { label: 'Inscripciones', href: 'enrollments.index', icon: FileText }, { label: 'Recaudos', href: 'memberships.index', icon: CircleDollarSign }, { label: 'Configuración', href: 'clubs.index', icon: Settings }, { label: 'Equipo', href: 'club-members.index', icon: UserCog }, { label: 'Flujos', href: 'flow-docs.index', icon: BookOpen },
 ];
 const athleteNavigation = [{ label: 'Mi portal', href: 'athlete.dashboard', icon: Home }, { label: 'Mis pagos', href: 'athlete.payments', icon: CircleDollarSign }, { label: 'Documentación', href: 'flow-docs.index', icon: BookOpen }];
 type ClubContext = { activeClub?: { id: number; name: string; slug: string } | null; clubs?: Array<{ id: number; name: string; slug: string }> };

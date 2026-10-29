@@ -48,6 +48,7 @@ No cambies el `.env` del usuario para hacer esta verificación.
 - `resources/js/Pages/Platform/AuditLogs.tsx`: auditoría global de accesos y operaciones.
 - `resources/js/Components/ui/`: inputs, selects y date pickers con estilo shadcn local. Los selects usan posicionamiento fijo para mostrarse por encima de modales y contenedores con overflow.
 - `resources/js/Components/GuidedTour.tsx`: botón flotante y recorridos Driver.js por componente Inertia; el estado se persiste por usuario en `guided_tours`.
+- `skills/nexo-club-guided-tours/SKILL.md`: contrato obligatorio para crear guías Driver.js de módulos nuevos con contenido, roles, pasos, estados y video reales.
 - `resources/js/lib/dates.ts`: formateo amigable de fechas y horas con la zona horaria global `America/Bogota`.
 - `resources/css/app.css`: tokens base y clases `.nexo-card` / `.nexo-eyebrow`.
 - `tailwind.config.js`: colores `nexo.lime`, `nexo.ink`, `nexo.surface`, `nexo.muted` y sombra lima.

@@ -1,6 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import PlatformLayout from '@/Layouts/PlatformLayout';
 import { SearchableSelect } from '@/Components/ui/searchable-select';
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import { BookOpen, Filter, PlayCircle, ShieldCheck, Video } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
@@ -23,11 +24,13 @@ const docs: DocItem[] = [
 ];
 
 export default function Index() {
+    const user = usePage().props.auth.user as { role?: string } | null;
+    const Layout = user?.role === 'superadmin' ? PlatformLayout : AuthenticatedLayout;
     const [role, setRole] = useState<Role>('Todos');
     const [module, setModule] = useState('Todos');
     const visibleDocs = useMemo(() => docs.filter((item) => (role === 'Todos' || item.roles.includes(role)) && (module === 'Todos' || item.module === module)), [role, module]);
 
-    return <AuthenticatedLayout header={<div><p className="nexo-eyebrow">Ayuda global</p><h1 className="mt-1 text-xl font-bold tracking-tight sm:text-2xl">Documentación</h1></div>}>
+    return <Layout header={<div><p className="nexo-eyebrow">Ayuda global</p><h1 className="mt-1 text-xl font-bold tracking-tight sm:text-2xl">Documentación</h1></div>}>
         <Head title="Documentación global" />
         <section className="mx-auto max-w-[1400px] space-y-6"><div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end"><div><p className="text-3xl font-extrabold tracking-tight sm:text-4xl">Centro de flujos</p><p className="mt-2 max-w-3xl text-sm text-slate-400">Guías visuales de cada rol, módulo y componente de NEXO CLUB. Los videos se publican únicamente cuando su render está disponible.</p></div><div className="flex items-center gap-2 rounded-xl border border-slate-800 bg-nexo-surface px-3 py-2 text-xs text-slate-400"><ShieldCheck size={15} className="text-nexo-lime" /> Disponible para todos los roles</div></div>
             <div className="nexo-card flex flex-col gap-4 p-5 lg:flex-row lg:items-center"><div className="flex items-center gap-2 text-sm font-semibold"><Filter size={17} className="text-nexo-lime" /> Filtrar documentación</div><div className="flex flex-1 flex-wrap gap-2">{roles.map((item) => <button key={item} type="button" onClick={() => setRole(item)} className={`rounded-xl px-3 py-2 text-xs font-semibold ${role === item ? 'bg-nexo-lime text-nexo-ink' : 'border border-slate-700 text-slate-400 hover:text-white'}`}>{item}</button>)}</div><div className="w-full lg:w-64"><SearchableSelect value={module} options={modules.map((item) => ({ id: item, label: item }))} onValueChange={setModule} searchPlaceholder="Buscar módulo..." /></div></div>
@@ -35,7 +38,7 @@ export default function Index() {
             <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">{visibleDocs.map((item) => <DocCard key={`${item.module}-${item.component}`} item={item} />)}</div>{visibleDocs.length === 0 && <div className="nexo-card p-12 text-center text-sm text-slate-500">No hay documentación para los filtros seleccionados.</div>}
             <div className="rounded-2xl border border-dashed border-slate-700 bg-slate-900/30 p-5 text-sm text-slate-400"><div className="flex items-center gap-2 font-semibold text-slate-200"><Video size={16} className="text-nexo-lime" /> Estado de producción audiovisual</div><p className="mt-2">El catálogo actual cuenta con un recorrido general y 10 Hyperframes individuales, uno por flujo, módulo y componente. Todos los videos publicados están asociados a su guía; los futuros flujos deben permanecer como “Video en producción” hasta contar con un MP4 real.</p></div>
         </section>
-    </AuthenticatedLayout>;
+    </Layout>;
 }
 
 function DocCard({ item }: { item: DocItem }) { return <article className="group nexo-card overflow-hidden transition hover:-translate-y-1 hover:border-nexo-lime/50"><VideoFrame src={item.video} title={item.title} duration={item.duration} /><div className="p-5"><div className="flex items-start justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-nexo-lime">{item.module}</p><h3 className="mt-2 font-bold">{item.title}</h3></div>{item.video ? <PlayCircle size={18} className="shrink-0 text-nexo-lime" /> : <span className="shrink-0 rounded-full bg-amber-400/10 px-2 py-1 text-[10px] font-bold text-amber-300">Pendiente</span>}</div><p className="mt-2 text-sm leading-6 text-slate-400">{item.description}</p><div className="mt-4 flex flex-wrap gap-2"><span className="rounded-lg bg-slate-900/70 px-2 py-1 text-[11px] text-slate-400">{item.component}</span>{item.roles.map((itemRole) => <span key={itemRole} className="rounded-lg bg-slate-900/70 px-2 py-1 text-[11px] text-slate-500">{itemRole}</span>)}</div></div></article>; }

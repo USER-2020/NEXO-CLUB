@@ -12,11 +12,11 @@ class MonthlyCharge extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['club_id', 'enrollment_id', 'period', 'due_date', 'amount', 'status', 'paid_at'];
+    protected $fillable = ['club_id', 'enrollment_id', 'period', 'period_end', 'due_date', 'amount', 'status', 'paid_at'];
 
     protected function casts(): array
     {
-        return ['period' => 'date', 'due_date' => 'date', 'paid_at' => 'datetime'];
+        return ['period' => 'date', 'period_end' => 'date', 'due_date' => 'date', 'paid_at' => 'datetime'];
     }
 
     public function club(): BelongsTo
