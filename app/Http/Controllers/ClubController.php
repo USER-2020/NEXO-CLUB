@@ -29,7 +29,7 @@ class ClubController extends Controller
         }
 
         return Inertia::render('Clubs/Index', [
-            'clubs' => $user->activeClubs()->withCount('disciplines')->when($search, fn ($query) => $query->where(fn ($query) => $query->where('clubs.name', 'like', "%{$search}%")->orWhere('clubs.slug', 'like', "%{$search}%")->orWhere('clubs.city', 'like', "%{$search}%")))->orderBy('name')->paginate(20, ['clubs.id', 'clubs.name', 'clubs.slug', 'clubs.city', 'clubs.currency']),
+            'clubs' => $user->activeClubs()->withCount('disciplines')->when($search, fn ($query) => $query->where(fn ($query) => $query->where('clubs.name', 'like', "%{$search}%")->orWhere('clubs.slug', 'like', "%{$search}%")->orWhere('clubs.city', 'like', "%{$search}%")))->orderBy('name')->paginate($this->pageSize($request), ['clubs.id', 'clubs.name', 'clubs.slug', 'clubs.city', 'clubs.currency'])->withQueryString(),
             'canCreate' => $user->can('create', Club::class),
             'activeClub' => $activeClub?->only(['id', 'name', 'slug', 'email', 'city', 'timezone']),
             'canUpdate' => $activeClub ? $user->can('update', $activeClub) : false,

@@ -29,7 +29,7 @@ class ClubMemberController extends Controller
         $memberQuery = $club->users()
             ->whereDoesntHave('athlete')
             ->when($search, fn ($query) => $query->where(fn ($query) => $query->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%")));
-        $members = $memberQuery->orderBy('name')->paginate(20)->through(fn (User $user) => [
+        $members = $memberQuery->orderBy('name')->paginate($this->pageSize($request))->withQueryString()->through(fn (User $user) => [
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,

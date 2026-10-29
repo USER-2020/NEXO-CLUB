@@ -3,7 +3,7 @@ import FlashToasts from '@/Components/FlashToasts';
 import { BarChart3, BookOpen, Building2, ChevronDown, FileClock, LogOut, Settings, ShieldCheck } from 'lucide-react';
 import { PropsWithChildren, ReactNode, useState } from 'react';
 
-const navigation = [{ label: 'Resumen global', href: 'platform.dashboard', icon: BarChart3 }, { label: 'Clubes', href: 'platform.clubs.index', icon: Building2 }, { label: 'Logs de auditoría', href: 'platform.logs.index', icon: FileClock }, { label: 'Documentación', href: 'flow-docs.index', icon: BookOpen }];
+const navigation = [{ label: 'Resumen global', href: 'platform.dashboard', icon: BarChart3 }, { label: 'Clubes', href: 'platform.clubs.index', icon: Building2 }, { label: 'Logs de auditoría', href: 'platform.logs.index', icon: FileClock }, { label: 'Documentación', href: 'platform.flow-docs.index', icon: BookOpen }];
 
 export default function PlatformLayout({ header, children }: PropsWithChildren<{ header?: ReactNode }>) {
     const user = usePage().props.auth.user; const [menuOpen, setMenuOpen] = useState(false);

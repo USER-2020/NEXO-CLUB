@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Models\MonthlyCharge;
 use App\Services\ActiveClubResolver;
+use App\Services\PlatformAccess;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Spatie\Permission\PermissionRegistrar;
@@ -71,6 +72,9 @@ class HandleInertiaRequests extends Middleware
             'clubContext' => [
                 'activeClub' => $activeClub?->only(['id', 'name', 'slug', 'currency', 'timezone']),
                 'clubs' => $user?->activeClubs()->get(['clubs.id', 'clubs.name', 'clubs.slug']) ?? [],
+            ],
+            'platformAccess' => [
+                'isSuperadmin' => $user ? app(PlatformAccess::class)->isSuperadmin($user) : false,
             ],
             'guidedTours' => $user?->guidedTours()->where('completed', true)->pluck('tour_key')->values() ?? [],
             'adminBillingNotifications' => $adminBillingNotifications,

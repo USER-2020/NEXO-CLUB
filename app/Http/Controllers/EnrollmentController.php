@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\EnrollmentActivatedMail;
 use App\Models\Club;
 use App\Models\Enrollment;
-use App\Mail\EnrollmentActivatedMail;
 use App\Services\BillingPeriodService;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 use Spatie\Permission\PermissionRegistrar;
@@ -26,7 +26,7 @@ class EnrollmentController extends Controller
         $enrollmentQuery->when($search, fn ($query) => $query->where(fn ($query) => $query->where('status', 'like', "%{$search}%")->orWhereHas('athlete', fn ($query) => $query->where('first_name', 'like', "%{$search}%")->orWhere('last_name', 'like', "%{$search}%"))->orWhereHas('discipline', fn ($query) => $query->where('name', 'like', "%{$search}%"))));
 
         return Inertia::render('Enrollments/Index', [
-            'enrollments' => $enrollmentQuery->latest()->paginate(20),
+            'enrollments' => $enrollmentQuery->latest()->paginate($this->pageSize($request))->withQueryString(),
             'athletes' => $club->athletes()->where('status', 'active')->orderBy('last_name')->get(['id', 'first_name', 'last_name']),
             'disciplines' => $club->disciplines()->where('is_active', true)->orderBy('name')->get(['id', 'name']),
         ]);

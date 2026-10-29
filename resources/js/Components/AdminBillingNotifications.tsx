@@ -25,7 +25,7 @@ export default function AdminBillingNotifications() {
 
     if (auth?.user?.role !== 'admin') return null;
 
-    return <div ref={ref} className="fixed right-16 top-3 z-[60] sm:right-20 sm:top-4 lg:right-24" data-tour="admin-billing-notifications">
+    return <div ref={ref} className="relative z-[60] shrink-0" data-tour="admin-billing-notifications">
         <button type="button" onClick={() => setOpen(true)} aria-label="Abrir centro de notificaciones" aria-expanded={open} className={open ? 'relative flex h-11 w-11 items-center justify-center rounded-xl bg-slate-800 text-nexo-lime transition focus:outline-none focus:ring-2 focus:ring-nexo-lime' : 'relative flex h-11 w-11 items-center justify-center rounded-xl text-slate-400 transition hover:bg-slate-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-nexo-lime'}>
             <Bell size={20} />
             {notifications.count > 0 && <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-nexo-ink bg-red-400 px-1 text-[9px] font-extrabold text-nexo-ink">{notifications.count > 99 ? '99+' : notifications.count}</span>}

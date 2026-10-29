@@ -24,8 +24,8 @@ const docs: DocItem[] = [
 ];
 
 export default function Index() {
-    const user = usePage().props.auth.user as { role?: string } | null;
-    const Layout = user?.role === 'superadmin' ? PlatformLayout : AuthenticatedLayout;
+    const page = usePage().props as { platformAccess?: { isSuperadmin?: boolean }; auth: { user: { role?: string } | null } };
+    const Layout = page.platformAccess?.isSuperadmin || page.auth.user?.role === 'superadmin' ? PlatformLayout : AuthenticatedLayout;
     const [role, setRole] = useState<Role>('Todos');
     const [module, setModule] = useState('Todos');
     const visibleDocs = useMemo(() => docs.filter((item) => (role === 'Todos' || item.roles.includes(role)) && (module === 'Todos' || item.module === module)), [role, module]);

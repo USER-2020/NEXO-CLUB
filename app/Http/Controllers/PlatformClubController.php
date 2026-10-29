@@ -21,7 +21,7 @@ class PlatformClubController extends Controller
     public function index(Request $request): Response
     {
         $search = trim($request->string('q')->toString());
-        $clubs = Club::withCount(['users', 'disciplines'])->when($search, fn ($query) => $query->where('name', 'like', "%{$search}%")->orWhere('slug', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%")->orWhere('city', 'like', "%{$search}%"))->orderBy('name')->paginate(20);
+        $clubs = Club::withCount(['users', 'disciplines'])->when($search, fn ($query) => $query->where('name', 'like', "%{$search}%")->orWhere('slug', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%")->orWhere('city', 'like', "%{$search}%"))->orderBy('name')->paginate($this->pageSize($request))->withQueryString();
         $clubs->getCollection()->each(function (Club $club): void {
             app(PermissionRegistrar::class)->setPermissionsTeamId($club->id);
             $club->load('primaryAdmin:id,name,email');

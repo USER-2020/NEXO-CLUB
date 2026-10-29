@@ -24,7 +24,7 @@ class DisciplineController extends Controller
         app(PermissionRegistrar::class)->setPermissionsTeamId($club->id);
 
         return Inertia::render('Disciplines/Index', [
-            'disciplines' => $disciplineQuery->orderBy('name')->paginate(20, ['id', 'name', 'description', 'is_active', 'created_at']),
+            'disciplines' => $disciplineQuery->orderBy('name')->paginate($this->pageSize($request), ['id', 'name', 'description', 'is_active', 'created_at'])->withQueryString(),
             'canManage' => $request->user()->can('create', Discipline::class),
         ]);
     }

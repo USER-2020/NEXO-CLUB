@@ -37,7 +37,7 @@ class BillingController extends Controller
         $chargeQuery->orderByRaw("CASE WHEN status IN ('pending', 'overdue') THEN 0 ELSE 1 END")->orderBy('due_date')->orderByDesc('id');
 
         return Inertia::render('Memberships/Index', [
-            'charges' => $chargeQuery->paginate(20)->withQueryString(),
+            'charges' => $chargeQuery->paginate($this->pageSize($request))->withQueryString(),
             'status' => $status ?: 'all',
             'paymentMethods' => $club->paymentMethods()->where('is_active', true)->orderBy('type')->get(),
             'paymentSubmissions' => PaymentSubmission::with(['athlete:id,first_name,last_name', 'monthlyCharge:id,period,due_date,amount,status', 'paymentMethod:id,label', 'reviewer:id,name'])

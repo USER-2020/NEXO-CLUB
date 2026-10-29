@@ -66,6 +66,7 @@ Route::get('/platform', PlatformDashboardController::class)
     ->name('platform.dashboard');
 
 Route::middleware(['auth', 'verified', 'platform.admin'])->prefix('platform')->group(function () {
+    Route::get('/documentacion-flujos', fn () => Inertia::render('FlowDocumentation/Index'))->name('platform.flow-docs.index');
     Route::get('/clubs', [PlatformClubController::class, 'index'])->name('platform.clubs.index');
     Route::get('/logs', [PlatformAuditController::class, 'index'])->name('platform.logs.index');
     Route::get('/clubs/{club}', [PlatformClubController::class, 'show'])->name('platform.clubs.show');

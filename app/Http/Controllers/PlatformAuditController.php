@@ -3,20 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Models\AuditLog;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use Illuminate\Http\Request;
 
 class PlatformAuditController extends Controller
 {
     public function index(Request $request): Response
     {
         $search = trim($request->string('q')->toString());
+
         return Inertia::render('Platform/AuditLogs', [
             'logs' => AuditLog::with(['user:id,name,email', 'club:id,name'])
                 ->when($search, fn ($query) => $query->where('action', 'like', "%{$search}%")->orWhere('ip_address', 'like', "%{$search}%")->orWhereHas('user', fn ($query) => $query->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"))->orWhereHas('club', fn ($query) => $query->where('name', 'like', "%{$search}%")))
                 ->latest()
-                ->paginate(50)
+                ->paginate($this->pageSize($request))
+                ->withQueryString()
                 ->through(fn (AuditLog $log) => [
                     'id' => $log->id,
                     'action' => $log->action,
