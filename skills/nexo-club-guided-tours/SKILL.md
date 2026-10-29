@@ -27,6 +27,7 @@ Lee `docs/agent-context.md`, `AGENTS.md` y revisa `resources/js/Components/Guide
 6. Si un objetivo no existe porque la colección está vacía o el rol no tiene esa acción, omite ese paso; nunca apuntes a un selector ficticio.
 7. Conserva la persistencia en `guided_tours`; no uses `localStorage`. La finalización se registra mediante `guided-tours.complete` para el usuario autenticado.
 8. Si el módulo tiene varias vistas o roles con flujos diferentes, define claves y pasos separados cuando el contenido o los permisos cambien materialmente.
+9. Todo componente registrado en `GuidedTour.tsx` debe abrir su guía automáticamente en la primera visita del usuario cuando aún no figure como completada en `guided_tours`; no limitar este comportamiento a dashboards. El botón `Visita guiada` debe permitir repetirla.
 
 ## Contenido de la guía
 
@@ -58,6 +59,7 @@ Antes de entregar:
 - navega cada rol autorizado y comprueba que la guía no muestre pasos de otro módulo;
 - verifica que todos los objetivos visibles existan en la pantalla;
 - comprueba el flujo de primera visita y repetición desde `Visita guiada`;
+- comprueba el autoarranque de la primera visita en cada componente registrado, no solo en dashboards;
 - comprueba el estado completado del usuario en `guided_tours`;
 - ejecuta `npm run build` y las pruebas backend relacionadas;
 - revisa que los pasos no oculten controles, no desborden en móvil y no dependan de datos ficticios.

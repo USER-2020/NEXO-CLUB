@@ -141,7 +141,6 @@ export default function GuidedTour() {
     const activeDriver = useRef<ReturnType<typeof driver> | null>(null);
     const autoStartedTour = useRef<string | null>(null);
     const completedTours = props.guidedTours ?? [];
-    const isRoleDashboard = ['Dashboard', 'Platform/Dashboard', 'Athletes/Portal'].includes(component);
 
     useEffect(() => () => { activeDriver.current?.destroy(); activeDriver.current = null; }, [component]);
 
@@ -190,13 +189,13 @@ export default function GuidedTour() {
     }, [completedTours, tour]);
 
     useEffect(() => {
-        if (!tour || !isRoleDashboard || completedTours.includes(tour.key) || autoStartedTour.current === tour.key) return;
+        if (!tour || completedTours.includes(tour.key) || autoStartedTour.current === tour.key) return;
 
         autoStartedTour.current = tour.key;
         const timeout = window.setTimeout(start, 350);
 
         return () => window.clearTimeout(timeout);
-    }, [completedTours, isRoleDashboard, start, tour]);
+    }, [completedTours, start, tour]);
 
     if (!tour) return null;
 

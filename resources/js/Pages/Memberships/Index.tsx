@@ -11,7 +11,7 @@ type PaymentMethod = { id: number; type: string; label: string; provider?: strin
 type PaymentSubmission = { id: number; athlete?: string; charge_id: number; period?: string; amount: number; method: string; reference?: string | null; status: string; rejection_reason?: string | null };
 const money = (value: number) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(value);
 
-export default function Index({ charges: paginatedCharges, paymentMethods = [], paymentSubmissions = [], status = 'all' }: { charges: { data: Charge[]; current_page: number; last_page: number; from?: number; to?: number; total?: number }; paymentMethods?: PaymentMethod[]; paymentSubmissions?: PaymentSubmission[]; status?: string }) {
+export default function Index({ charges: paginatedCharges, paymentMethods = [], paymentSubmissions = [], status = 'all' }: { charges: { data: Charge[]; current_page: number; last_page: number; from?: number; to?: number; total?: number; per_page?: number }; paymentMethods?: PaymentMethod[]; paymentSubmissions?: PaymentSubmission[]; status?: string }) {
     const charges = paginatedCharges.data;
     const [filter, setFilter] = useState(status);
     const filterOptions = [{ id: 'all', label: 'Todos' }, { id: 'pending', label: 'Pendientes' }, { id: 'paid', label: 'Pagados' }];

@@ -5,7 +5,6 @@ import { SearchableSelect } from '@/Components/ui/searchable-select';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { Building2, CheckCircle2, CreditCard, MapPin, Pencil, Plus, Save, Trash2, Users } from 'lucide-react';
 import { FormEventHandler } from 'react';
-import Pagination from '@/Components/Pagination';
 
 type Club = { id: number; name: string; slug: string; email?: string | null; city?: string | null; timezone?: string; currency?: string; disciplines_count?: number };
 type PaymentMethod = { id: number; type: 'bank_account' | 'nequi' | 'bre_b' | 'payment_key'; label: string; provider?: string | null; account_type?: string | null; account_number?: string | null; account_holder?: string | null; holder_document?: string | null; key_type?: string | null; notes?: string | null; is_active: boolean };

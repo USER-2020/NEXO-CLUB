@@ -2,7 +2,6 @@ import { router, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { confirmToast } from '@/Components/ConfirmToast';
-import Pagination from '@/Components/Pagination';
 import SmartSearch from '@/Components/SmartSearch';
 
 type FlashProps = {
@@ -15,8 +14,6 @@ type FlashProps = {
 
 export default function FlashToasts() {
     const flash = (usePage().props.flash as FlashProps | undefined) ?? {};
-    const page = usePage();
-    const pagination = Object.values(page.props).find((value) => value && typeof value === 'object' && 'current_page' in value && 'last_page' in value) as { current_page: number; last_page: number; from?: number; to?: number; total?: number; per_page?: number } | undefined;
     const [operationActive, setOperationActive] = useState(false);
 
     useEffect(() => {
@@ -56,5 +53,5 @@ export default function FlashToasts() {
         }
     }, [flash.error, flash.success, flash.createdAccess, flash.athleteAccess, flash.verificationRequired, operationActive]);
 
-    return <><SmartSearch />{pagination ? <div className="fixed bottom-4 left-1/2 z-50 w-[min(92vw,680px)] -translate-x-1/2 rounded-2xl border border-slate-700 bg-nexo-surface shadow-2xl"><Pagination {...pagination} /></div> : null}</>;
+    return <SmartSearch />;
 }

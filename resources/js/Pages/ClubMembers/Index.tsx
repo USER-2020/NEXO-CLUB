@@ -4,6 +4,7 @@ import { SearchableSelect } from '@/Components/ui/searchable-select';
 import { Head, router, useForm } from '@inertiajs/react';
 import { Eye, EyeOff, ShieldCheck, Trash2, UserCog, UserPlus, Users } from 'lucide-react';
 import { Children, cloneElement, FormEventHandler, isValidElement, ReactElement, ReactNode, useState } from 'react';
+import Pagination from '@/Components/Pagination';
 
 type Member = {
     id: number;
@@ -20,7 +21,7 @@ const roleLabels: Record<string, string> = {
     usuario: 'Usuario',
 };
 
-export default function Index({ members: paginatedMembers, roles }: { members: { data: Member[]; current_page: number; last_page: number; from?: number; to?: number; total?: number }; roles: string[] }) {
+export default function Index({ members: paginatedMembers, roles }: { members: { data: Member[]; current_page: number; last_page: number; from?: number; to?: number; total?: number; per_page?: number }; roles: string[] }) {
     const members = paginatedMembers.data;
     const { data, setData, post, processing, errors, reset } = useForm({ name: '', email: '', password: '', role: 'usuario' });
     const submit: FormEventHandler = (event) => {
@@ -92,6 +93,7 @@ export default function Index({ members: paginatedMembers, roles }: { members: {
                         </form>
                     </div>
                 </div>
+                <Pagination {...paginatedMembers} />
             </section>
         </AuthenticatedLayout>
     );

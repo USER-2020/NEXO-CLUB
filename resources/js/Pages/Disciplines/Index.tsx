@@ -2,6 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router, useForm } from '@inertiajs/react';
 import { CheckCircle2, Dumbbell, Edit3, Plus, XCircle } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
+import Pagination from '@/Components/Pagination';
 
 type Discipline = {
     id: number;
@@ -11,7 +12,7 @@ type Discipline = {
     created_at: string;
 };
 
-export default function Index({ disciplines: paginatedDisciplines, canManage }: { disciplines: { data: Discipline[]; current_page: number; last_page: number; from?: number; to?: number; total?: number }; canManage: boolean }) {
+export default function Index({ disciplines: paginatedDisciplines, canManage }: { disciplines: { data: Discipline[]; current_page: number; last_page: number; from?: number; to?: number; total?: number; per_page?: number }; canManage: boolean }) {
     const disciplines = paginatedDisciplines.data;
     const [editingId, setEditingId] = useState<number | null>(null);
     const { data, setData, post, patch, processing, errors, reset } = useForm({ name: '', description: '' });
@@ -73,6 +74,7 @@ export default function Index({ disciplines: paginatedDisciplines, canManage }: 
 
                     {canManage && <div id="discipline-form" className="nexo-card h-fit p-6 xl:sticky xl:top-24"><div className="flex items-start gap-3"><div className="rounded-xl bg-nexo-lime/10 p-3 text-nexo-lime">{editingId ? <Edit3 size={20} /> : <Plus size={20} />}</div><div><h2 className="font-bold">{editingId ? 'Editar disciplina' : 'Agregar disciplina'}</h2><p className="mt-1 text-sm text-slate-500">{editingId ? 'Actualiza la información de la disciplina seleccionada.' : 'Crea una disciplina para usarla en las inscripciones.'}</p></div></div><form onSubmit={submit} className="mt-6 space-y-4"><label className="block text-sm font-semibold text-slate-300">Nombre<input value={data.name} onChange={(event) => setData('name', event.target.value)} className="member-input mt-2" placeholder="Ej. Fútbol" required />{errors.name && <span className="mt-1 block text-xs font-normal text-red-300">{errors.name}</span>}</label><label className="block text-sm font-semibold text-slate-300">Descripción<textarea value={data.description} onChange={(event) => setData('description', event.target.value)} className="member-input mt-2 min-h-28 resize-y" placeholder="Describe la disciplina o categoría general." />{errors.description && <span className="mt-1 block text-xs font-normal text-red-300">{errors.description}</span>}</label><div className="flex gap-2"><button disabled={processing} className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-nexo-lime px-4 py-3 text-sm font-bold text-nexo-ink shadow-lime transition hover:brightness-105 disabled:opacity-50">{editingId ? <Edit3 size={17} /> : <Plus size={17} />}{processing ? 'Guardando…' : editingId ? 'Guardar cambios' : 'Crear disciplina'}</button>{editingId && <button type="button" onClick={cancelEditing} className="rounded-xl border border-slate-700 px-4 py-3 text-sm font-semibold text-slate-300 transition hover:bg-slate-800">Cancelar</button>}</div></form></div>}
                 </div>
+                <Pagination {...paginatedDisciplines} />
             </section>
         </AuthenticatedLayout>
     );

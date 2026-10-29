@@ -114,7 +114,7 @@ php artisan migrate:fresh --seed
 - Cada módulo debe registrar una clave estable en `GuidedTour.tsx` y definir pasos basados en su flujo real: contexto, acción principal, captura/validación, carga o confirmación y resultado cuando existan. Los objetivos específicos deben usar `data-tour` semánticos y no selectores ficticios.
 - Si una vista cambia materialmente por rol, debe definir pasos separados o filtrar los pasos según el rol; no reutilizar una guía de administrador para superadmin o deportista.
 - El estado de finalización se guarda en `guided_tours`, asociado a `user_id` y `tour_key`; no usar `localStorage` como fuente de verdad.
-- La guía del dashboard por rol se abre automáticamente la primera vez que el usuario entra si aún no está completada. Después puede repetirse desde el botón flotante `Visita guiada` en cualquier módulo disponible.
+- La guía de cada módulo registrado en `GuidedTour.tsx` se abre automáticamente la primera vez que el usuario visita ese componente si aún no está completada. Después puede repetirse desde el botón flotante `Visita guiada` en cualquier módulo disponible. No limitar el autoarranque a dashboards.
 - El backend comparte las claves completadas mediante Inertia y el endpoint `guided-tours.complete` valida que solo el usuario autenticado pueda marcar su propia guía.
 
 ## Seeders de producción
