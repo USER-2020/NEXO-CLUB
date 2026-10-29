@@ -12,7 +12,7 @@ export default defineConfig({
         react(),
         VitePWA({
             registerType: 'prompt',
-            includeAssets: ['brand-mark.svg'],
+            includeAssets: ['brand-mark.svg', 'og-image.svg'],
             manifest: {
                 name: 'NEXO CLUB',
                 short_name: 'NEXO CLUB',
