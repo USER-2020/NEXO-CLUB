@@ -9,9 +9,9 @@
         <meta name="color-scheme" content="dark">
         <link rel="canonical" href="{{ url()->current() }}">
 
-        <link rel="icon" href="{{ asset('brand-mark.svg') }}" type="image/svg+xml">
-        <link rel="shortcut icon" href="{{ asset('brand-mark.svg') }}" type="image/svg+xml">
-        <link rel="apple-touch-icon" href="{{ asset('brand-mark.svg') }}">
+        <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+        <link rel="shortcut icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+        <link rel="apple-touch-icon" href="{{ asset('favicon.svg') }}">
         <link rel="manifest" href="{{ asset('build/manifest.webmanifest') }}">
 
         <meta property="og:site_name" content="NEXO CLUB">
