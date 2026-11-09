@@ -1,7 +1,8 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import PlatformLayout from '@/Layouts/PlatformLayout';
 import AthletePersonalDataForm from '@/Components/AthletePersonalDataForm';
 import { PageProps } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import DeleteUserForm from './Partials/DeleteUserForm';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
@@ -11,8 +12,11 @@ export default function Edit({
     status,
     athlete,
 }: PageProps<{ mustVerifyEmail: boolean; status?: string; athlete?: Parameters<typeof AthletePersonalDataForm>[0]['athlete'] | null }>) {
+    const page = usePage().props as PageProps & { platformAccess?: { isSuperadmin?: boolean } };
+    const Layout = page.platformAccess?.isSuperadmin ? PlatformLayout : AuthenticatedLayout;
+
     return (
-        <AuthenticatedLayout
+        <Layout
             header={
                 <h2 className="text-xl font-bold leading-tight tracking-tight text-slate-100">
                     Mi perfil
@@ -42,6 +46,6 @@ export default function Edit({
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </Layout>
     );
 }

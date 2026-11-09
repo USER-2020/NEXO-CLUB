@@ -1,15 +1,70 @@
 import { Link, usePage } from '@inertiajs/react';
-import FlashToasts from '@/Components/FlashToasts';
-import { BarChart3, BookOpen, Building2, ChevronDown, FileClock, LogOut, Settings, ShieldCheck } from 'lucide-react';
+import { BarChart3, BookOpen, Building2, ChevronDown, FileClock, LogOut, Menu, Settings, ShieldCheck, X } from 'lucide-react';
 import { PropsWithChildren, ReactNode, useState } from 'react';
+import FlashToasts from '@/Components/FlashToasts';
 import Pagination from '@/Components/Pagination';
 
-const navigation = [{ label: 'Resumen global', href: 'platform.dashboard', icon: BarChart3 }, { label: 'Clubes', href: 'platform.clubs.index', icon: Building2 }, { label: 'Logs de auditoría', href: 'platform.logs.index', icon: FileClock }, { label: 'Documentación', href: 'platform.flow-docs.index', icon: BookOpen }];
+const navigation = [
+    { label: 'Resumen global', href: 'platform.dashboard', icon: BarChart3 },
+    { label: 'Clubes', href: 'platform.clubs.index', icon: Building2 },
+    { label: 'Logs de auditoría', href: 'platform.logs.index', icon: FileClock },
+    { label: 'Documentación', href: 'platform.flow-docs.index', icon: BookOpen },
+];
 
 export default function PlatformLayout({ header, children }: PropsWithChildren<{ header?: ReactNode }>) {
-    const user = usePage().props.auth.user; const [menuOpen, setMenuOpen] = useState(false);
-    return <div className="min-h-screen bg-nexo-ink text-slate-100"><FlashToasts /><aside className="fixed inset-y-0 left-0 z-40 hidden w-72 flex-col border-r border-slate-800/80 bg-nexo-ink px-5 py-6 lg:flex"><Link href={route('platform.dashboard')} className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-nexo-lime text-lg font-black text-nexo-ink">N</span><span className="text-lg font-extrabold">NEXO<span className="text-nexo-lime">.</span></span></Link><div className="mt-10 rounded-2xl border border-nexo-lime/20 bg-nexo-lime/10 p-4"><div className="flex items-center gap-2 text-nexo-lime"><ShieldCheck size={17} /><span className="text-xs font-bold uppercase tracking-[0.16em]">Plataforma</span></div><p className="mt-2 text-sm font-semibold">Panel Superadmin</p><p className="mt-1 text-xs leading-5 text-slate-400">Control global de NEXO CLUB.</p></div><nav className="mt-8 flex-1 space-y-1"><p className="nexo-eyebrow mb-3 px-3">Administración global</p>{navigation.map((item) => { const Icon = item.icon; const active = route().current(item.href); return <Link key={item.label} href={route(item.href)} data-tour={active ? 'module-nav' : undefined} className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition ${active ? 'bg-nexo-lime text-nexo-ink shadow-lime' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}><Icon size={18} />{item.label}</Link>; })}</nav><div className="rounded-2xl bg-gradient-to-br from-nexo-lime/20 to-transparent p-4"><p className="text-sm font-semibold">NEXO CLUB</p><p className="mt-1 text-xs leading-5 text-slate-400">Gobierna todos tus clubes desde un solo lugar.</p></div></aside><div className="lg:pl-72"><header data-tour="module-header" className="sticky top-0 z-30 border-b border-slate-800/80 bg-nexo-ink/90 px-4 py-4 backdrop-blur-xl sm:px-8"><div className="flex items-center justify-between gap-4">{header}<div className="relative"><button type="button" onClick={() => setMenuOpen(!menuOpen)} className="flex items-center gap-3 rounded-xl p-1.5 text-left transition hover:bg-slate-800" aria-expanded={menuOpen}><div className="flex h-9 w-9 items-center justify-center rounded-full bg-nexo-lime font-bold text-nexo-ink">{user.name.charAt(0).toUpperCase()}</div><div className="hidden sm:block"><p className="text-sm font-semibold">{user.name}</p><p className="text-xs text-slate-500">Superadmin</p></div><ChevronDown size={16} className={`text-slate-500 transition ${menuOpen ? 'rotate-180' : ''}`} /></button>{menuOpen && <div className="absolute right-0 top-14 z-50 w-56 rounded-2xl border border-slate-700 bg-nexo-surface p-2 shadow-2xl"><Link href={route('profile.edit')} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-300 hover:bg-slate-800"><Settings size={16} /> Mi perfil</Link><Link href={route('logout')} method="post" as="button" className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-red-300 hover:bg-red-400/10"><LogOut size={16} /> Cerrar sesión</Link></div>}</div></div></header><main data-tour="module-content" className="min-h-[calc(100vh-73px)] px-4 pb-16 pt-6 sm:px-8 lg:px-10">{children}<PlatformPaginationOutlet /></main></div></div>;
+    const user = usePage().props.auth.user;
+    const [profileOpen, setProfileOpen] = useState(false);
+    const [mobileOpen, setMobileOpen] = useState(false);
+
+    return (
+        <div className="min-h-screen bg-nexo-ink text-slate-100">
+            <FlashToasts />
+            <aside className="fixed inset-y-0 left-0 z-40 hidden w-72 flex-col border-r border-slate-800/80 bg-nexo-ink px-5 py-6 lg:flex">
+                <Brand />
+                <PlatformIntro />
+                <Navigation />
+                <PlatformFooter />
+            </aside>
+
+            <div className="lg:pl-72">
+                <header data-tour="module-header" className="sticky top-0 z-30 border-b border-slate-800/80 bg-nexo-ink/90 px-4 py-4 backdrop-blur-xl sm:px-8">
+                    <div className="flex items-center justify-between gap-4">
+                        <div className="flex min-w-0 items-center gap-3">
+                            <button type="button" onClick={() => setMobileOpen(!mobileOpen)} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl text-slate-400 transition hover:bg-slate-800 hover:text-white lg:hidden" aria-label={mobileOpen ? 'Cerrar menú de plataforma' : 'Abrir menú de plataforma'} aria-expanded={mobileOpen}>
+                                {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+                            </button>
+                            <div className="min-w-0">{header}</div>
+                        </div>
+                        <div className="relative shrink-0">
+                            <button type="button" onClick={() => setProfileOpen(!profileOpen)} className="flex items-center gap-3 rounded-xl p-1.5 text-left transition hover:bg-slate-800" aria-expanded={profileOpen} aria-haspopup="menu">
+                                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-nexo-lime font-bold text-nexo-ink">{user.name.charAt(0).toUpperCase()}</div>
+                                <div className="hidden sm:block"><p className="max-w-48 truncate text-sm font-semibold">{user.name}</p><p className="text-xs text-slate-500">Superadmin</p></div>
+                                <ChevronDown size={16} className={`text-slate-500 transition ${profileOpen ? 'rotate-180' : ''}`} />
+                            </button>
+                            {profileOpen && <div className="absolute right-0 top-14 z-50 w-56 rounded-2xl border border-slate-700 bg-nexo-surface p-2 shadow-2xl" role="menu"><Link href={route('profile.edit')} onClick={() => setProfileOpen(false)} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-300 hover:bg-slate-800" role="menuitem"><Settings size={16} /> Mi perfil</Link><Link href={route('logout')} method="post" as="button" onClick={() => setProfileOpen(false)} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-red-300 hover:bg-red-400/10" role="menuitem"><LogOut size={16} /> Cerrar sesión</Link></div>}
+                        </div>
+                    </div>
+                </header>
+
+                {mobileOpen && <div className="fixed inset-0 z-20 bg-nexo-ink/95 px-4 pb-24 pt-24 backdrop-blur-xl lg:hidden"><div className="mx-auto max-w-md"><PlatformIntro compact /><Navigation mobile onNavigate={() => setMobileOpen(false)} /></div></div>}
+
+                <main data-tour="module-content" className="min-h-[calc(100vh-73px)] px-4 pb-24 pt-6 sm:px-8 lg:px-10 lg:pb-16">{children}<PlatformPaginationOutlet /></main>
+
+                <nav className="fixed inset-x-0 bottom-0 z-30 flex justify-around border-t border-slate-800 bg-nexo-ink/95 px-2 py-3 backdrop-blur-xl lg:hidden" aria-label="Navegación de plataforma">
+                    {navigation.map((item) => { const Icon = item.icon; const active = route().current(item.href); return <Link key={item.label} href={route(item.href)} data-tour={active ? 'module-nav' : undefined} className={`flex min-w-0 flex-1 flex-col items-center gap-1 px-1 text-[10px] font-medium ${active ? 'text-nexo-lime' : 'text-slate-500'}`}><Icon size={18} /> <span className="max-w-full truncate">{item.label.replace(' global', '')}</span></Link>; })}
+                </nav>
+            </div>
+        </div>
+    );
 }
+
+function Navigation({ mobile = false, onNavigate }: { mobile?: boolean; onNavigate?: () => void }) {
+    return <nav className={mobile ? 'mt-6 space-y-2' : 'mt-8 flex-1 space-y-1'}>{!mobile && <p className="nexo-eyebrow mb-3 px-3">Administración global</p>}{navigation.map((item) => { const Icon = item.icon; const active = route().current(item.href); return <Link key={item.label} href={route(item.href)} onClick={onNavigate} data-tour={active ? 'module-nav' : undefined} className={mobile ? `flex min-h-12 items-center gap-3 rounded-xl px-4 py-3 text-base font-medium transition ${active ? 'bg-nexo-lime text-nexo-ink' : 'text-slate-300 hover:bg-slate-800'}` : `flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition ${active ? 'bg-nexo-lime text-nexo-ink shadow-lime' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}><Icon size={mobile ? 20 : 18} />{item.label}</Link>; })}</nav>;
+}
+
+function Brand() { return <Link href={route('platform.dashboard')} className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-nexo-lime text-lg font-black text-nexo-ink">N</span><span className="text-lg font-extrabold">NEXO<span className="text-nexo-lime">.</span></span></Link>; }
+function PlatformIntro({ compact = false }: { compact?: boolean }) { return <div className={`${compact ? '' : 'mt-10 '}rounded-2xl border border-nexo-lime/20 bg-nexo-lime/10 p-4`}><div className="flex items-center gap-2 text-nexo-lime"><ShieldCheck size={17} /><span className="text-xs font-bold uppercase tracking-[0.16em]">Plataforma</span></div><p className="mt-2 text-sm font-semibold">Panel Superadmin</p><p className="mt-1 text-xs leading-5 text-slate-400">Control global de NEXO CLUB.</p></div>; }
+function PlatformFooter() { return <div className="rounded-2xl bg-gradient-to-br from-nexo-lime/20 to-transparent p-4"><p className="text-sm font-semibold">NEXO CLUB</p><p className="mt-1 text-xs leading-5 text-slate-400">Gobierna todos tus clubes desde un solo lugar.</p></div>; }
 
 function PlatformPaginationOutlet() {
     const { props } = usePage();
