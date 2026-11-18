@@ -33,6 +33,7 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
+        $request->session()->put('show_club_onboarding', true);
 
         $destination = app(PlatformAccess::class)->isSuperadmin($request->user())
             ? 'platform.dashboard'

@@ -1,0 +1,27 @@
+[
+  {
+    "id": "club-configuracion",
+    "label": "Configura el club",
+    "summary": "Confirma el club activo, completa su información y publica los medios que usarán los deportistas."
+  },
+  {
+    "id": "disciplinas",
+    "label": "Crea una disciplina",
+    "summary": "Crea la disciplina que ofrecerás y verifica que figure como Activa antes de inscribir a alguien."
+  },
+  {
+    "id": "deportistas-perfil",
+    "label": "Registra al primer deportista",
+    "summary": "Completa el perfil y elige la disciplina en el último paso del alta. Este asistente crea la inscripción y el primer cargo al guardar."
+  },
+  {
+    "id": "inscripciones",
+    "label": "Revisa la inscripción",
+    "summary": "Confirma la disciplina, tarifa y estado. Si registraste el perfil sin disciplina, crea la inscripción en este módulo. Si ya existe, evita duplicarla. Una inscripción creada por separado requiere activación para que se genere el cargo cuando corresponda."
+  },
+  {
+    "id": "mensualidades-cobros",
+    "label": "Confirma el primer recaudo",
+    "summary": "Ubica el primer cargo y usa Registrar pago si recibiste el efectivo. Verifica que el cargo quede pagado y que la inscripción se active. Si la cuenta ya tenía acceso y hay un comprobante enviado, puedes revisarlo y aprobarlo."
+  }
+]

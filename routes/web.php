@@ -8,6 +8,7 @@ use App\Http\Controllers\ClubController;
 use App\Http\Controllers\ClubMemberController;
 use App\Http\Controllers\DisciplineController;
 use App\Http\Controllers\EnrollmentController;
+use App\Http\Controllers\FlowDocumentationController;
 use App\Http\Controllers\GuidedTourController;
 use App\Http\Controllers\PlatformAuditController;
 use App\Http\Controllers\PlatformClubApplicationController;
@@ -43,7 +44,9 @@ Route::get('/dashboard', function (Request $request) {
     $monthStart = now()->startOfMonth();
     $monthEnd = now()->endOfMonth();
 
+    $showOnboarding = $request->user()->roles()->where('name', 'admin')->exists() && $request->session()->pull('show_club_onboarding', false);
     return Inertia::render('Dashboard', [
+        'onboardingChapters' => $showOnboarding ? FlowDocumentationController::onboardingChapters() : [],
         'stats' => [
             'activeAthletes' => $club->enrollments()->where('status', 'active')->distinct('athlete_id')->count('athlete_id'),
             'monthlyEnrollments' => $club->enrollments()->whereBetween('created_at', [$monthStart, $monthEnd])->count(),
@@ -66,7 +69,10 @@ Route::get('/platform', PlatformDashboardController::class)
     ->name('platform.dashboard');
 
 Route::middleware(['auth', 'verified', 'platform.admin'])->prefix('platform')->group(function () {
-    Route::get('/documentacion-flujos', fn () => Inertia::render('FlowDocumentation/Index'))->name('platform.flow-docs.index');
+    Route::get('/documentacion-flujos', FlowDocumentationController::class)->name('platform.flow-docs.index');
+    Route::get('/documentacion-flujos/media/{guide}.{extension}', [FlowDocumentationController::class, 'platformMedia'])
+        ->where(['guide' => '[a-z0-9-]+', 'extension' => 'mp4|jpg'])
+        ->name('platform.flow-docs.media');
     Route::get('/clubs', [PlatformClubController::class, 'index'])->name('platform.clubs.index');
     Route::get('/logs', [PlatformAuditController::class, 'index'])->name('platform.logs.index');
     Route::get('/clubs/{club}', [PlatformClubController::class, 'show'])->name('platform.clubs.show');
@@ -82,7 +88,7 @@ Route::middleware(['auth', 'verified', 'platform.admin'])->prefix('platform')->g
 
 Route::middleware('auth')->group(function () {
     Route::post('/club-context', ClubContextController::class)->name('clubs.switch');
-    Route::get('/documentacion-flujos', fn () => Inertia::render('FlowDocumentation/Index'))->name('flow-docs.index');
+    Route::get('/documentacion-flujos', FlowDocumentationController::class)->name('flow-docs.index');
     Route::post('/guided-tours/{tourKey}/complete', [GuidedTourController::class, 'complete'])->name('guided-tours.complete');
 
     Route::get('/mi-dashboard', AthletePortalController::class)

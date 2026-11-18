@@ -10,7 +10,7 @@ const messages: Record<Operation, { create: string[]; update: string[] }> = {
         update: ['Actualizando deportista', 'Guardando cambios del perfil', 'Sincronizando información'],
     },
     enrollment: {
-        create: ['Creando inscripción', 'Asociando deportista y disciplina', 'Activando inscripción'],
+        create: ['Creando inscripción', 'Asociando deportista y disciplina', 'Registrando inscripción pendiente'],
         update: ['Actualizando inscripción', 'Guardando condiciones de mensualidad', 'Sincronizando estado'],
     },
     club: {
@@ -39,16 +39,18 @@ const messages: Record<Operation, { create: string[]; update: string[] }> = {
     },
 };
 
-export function OperationProgressModal({ operation }: { operation: Operation }) {
-    const [phase, setPhase] = useState(0);
+export function OperationProgressModal({ operation, previewPhase }: { operation: Operation; previewPhase?: number }) {
+    const [currentPhase, setPhase] = useState(0);
+    const phase = previewPhase ?? currentPhase;
     const steps = messages[operation].create;
 
     useEffect(() => {
+        if (previewPhase !== undefined) return;
         // Cada etapa permanece visible cinco segundos para que el usuario pueda
         // leer el paso completo. El último paso no se corta al finalizar la petición.
         const timer = window.setInterval(() => setPhase((current) => Math.min(current + 1, steps.length - 1)), 5000);
         return () => window.clearInterval(timer);
-    }, [steps.length]);
+    }, [previewPhase, steps.length]);
 
     const progress = ((phase + 1) / steps.length) * 100;
 
@@ -82,50 +84,33 @@ export function GlobalOperationProgressModal() {
     const minimumDuration = 16000;
 
     useEffect(() => {
-        const detectOperation = (): Operation | null => {
-            const path = window.location.pathname;
-            if (path.includes('/athletes')) return 'athlete';
-            if (path.includes('/enrollments')) return 'enrollment';
-            if (path.endsWith('/register') || path === '/register') return 'club_application';
-            if (path.includes('/disciplines')) return 'discipline';
-            if (path.includes('/club-members')) return 'member';
-            if (path.includes('/clubs') || path.includes('/platform')) return 'club';
-            if (path.includes('/mi-dashboard/mensualidades')) return 'payment_submission';
-            return null;
+        const pathFor = (url: string) => new URL(url, window.location.href).pathname;
+        const operations: Record<string, Operation> = {
+            [pathFor(route('athletes.store'))]: 'athlete',
+            [pathFor(route('enrollments.store'))]: 'enrollment',
+            [pathFor(route('disciplines.store'))]: 'discipline',
+            [pathFor(route('club-members.store'))]: 'member',
+            [pathFor(route('clubs.store'))]: 'club',
+            [pathFor(route('platform.clubs.store'))]: 'club',
+            [pathFor(route('clubs.payment-methods.store'))]: 'payment_method',
+            [pathFor(route('register'))]: 'club_application',
         };
-        const handleSubmit = (event: Event) => {
-            const submitter = (event as SubmitEvent).submitter as HTMLElement | null;
-            const label = submitter?.textContent?.toLowerCase() ?? '';
-            const type = label.includes('agregar medio de pago') ? 'payment_method' : detectOperation();
-            if (!type) return;
-            const finalLabels: Record<Operation, string[]> = {
-                athlete: ['crear deportista', 'asociar inscripción y recaudo'],
-                enrollment: ['crear inscripción'],
-                club: ['crear club', 'crear club y acceso'],
-                club_application: ['enviar solicitud'],
-                discipline: ['crear disciplina'],
-                member: ['agregar al club'],
-                payment_method: ['agregar medio de pago'],
-                payment_submission: ['enviar comprobante'],
-            };
-            const isFinalSubmit = finalLabels[type].some((finalLabel) => label.includes(finalLabel));
+        const receiptPath = pathFor(route('athlete.payment-submissions.store', 1));
+        const removeStartListener = router.on('start', ({ detail: { visit } }) => {
+            if (visit.method !== 'post') return;
 
-            // El loader es exclusivo para INSERT/asociaciones nuevas. Los submits
-            // de edición, eliminación o cambio de estado continúan con Toast.
-            if (!isFinalSubmit) {
-                if (type === 'athlete' || type === 'enrollment') {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-                return;
-            }
+            const path = visit.url.pathname;
+            const isReceipt = path.replace(/\/\d+\/comprobante$/, '/1/comprobante') === receiptPath;
+            const type = operations[path] ?? (isReceipt ? 'payment_submission' : null);
+            if (!type) return;
 
             startedAtRef.current = Date.now();
             setOperation({ type });
             document.dispatchEvent(new CustomEvent('nexo:operation-start'));
-        };
+        });
         const handleFinish = () => {
-            const elapsed = startedAtRef.current ? Date.now() - startedAtRef.current : minimumDuration;
+            if (startedAtRef.current === null) return;
+            const elapsed = Date.now() - startedAtRef.current;
             const remaining = Math.max(0, minimumDuration - elapsed);
             if (finishTimerRef.current) window.clearTimeout(finishTimerRef.current);
             finishTimerRef.current = window.setTimeout(() => {
@@ -138,14 +123,13 @@ export function GlobalOperationProgressModal() {
         const removeFinishListener = router.on('finish', handleFinish);
         const removeErrorListener = router.on('error', handleFinish);
         const removeExceptionListener = router.on('exception', handleFinish);
-        document.addEventListener('submit', handleSubmit, true);
 
         return () => {
             if (finishTimerRef.current) window.clearTimeout(finishTimerRef.current);
             removeFinishListener();
             removeErrorListener();
             removeExceptionListener();
-            document.removeEventListener('submit', handleSubmit, true);
+            removeStartListener();
         };
     }, []);
 

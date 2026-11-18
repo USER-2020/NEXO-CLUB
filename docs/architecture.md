@@ -54,3 +54,12 @@ La PWA precachea recursos estáticos y no almacena datos financieros ni perfiles
 - El dashboard de cada rol (`Dashboard`, `Platform/Dashboard` y `Athletes/Portal`) inicia su tour automáticamente cuando la clave aún no está completada. El botón flotante permanece disponible para repetir cualquier tour.
 - La política de cobro de inscripciones a mitad de mes se decidirá antes del módulo de facturación y se persistirá en la configuración del club.
 - Las fotos privadas no se publican mediante `storage:link`; una ruta autenticada verifica sesión y club activo antes de entregar el archivo.
+
+
+## Documentación audiovisual y primeros pasos
+
+El catálogo `resources/hyperframes/flows/catalog.json` contiene los pasos, roles y componentes Inertia de cada guía. Las composiciones reutilizan las páginas y controles React de NEXO CLUB. Durante la captura, un adaptador de Inertia reproduce los resultados con datos de ejemplo aislados. Las acciones de la composición no envían peticiones a Laravel.
+
+`npm run videos:render` genera las composiciones, renderiza con Hyperframes y extrae una portada JPEG por video con FFmpeg. Los videos comunes se publican en `public/flow-videos/` cuando termina el conjunto. El recorrido general contiene únicamente guías compartidas. Laravel filtra el catálogo antes de enviarlo a Inertia y sirve los videos y portadas exclusivos desde `resources/hyperframes/platform-videos/` mediante una ruta protegida por el middleware de Superadmin. Las guías conservan sus instrucciones escritas si falta algún archivo.
+
+Al autenticar, Laravel activa una marca de sesión que el primer Resumen del administrador del club consume. El modal de primeros pasos usa los capítulos de `resources/hyperframes/flows/onboarding.json`. Cada capítulo muestra un GIF generado con FFmpeg a partir de su Hyperframe y conserva las instrucciones del catálogo. `bash scripts/render-onboarding-gifs.sh` vuelve a generar los GIFs a partir de los MP4 disponibles. Driver.js espera a que el modal se cierre antes de mostrar la visita al Resumen, si corresponde.

@@ -37,6 +37,12 @@
 - [x] Flujo de superadmin para aprobar/rechazar solicitudes; la aprobación crea el club y activa al administrador principal.
 - [x] Correos de recepción y activación de solicitudes de club, condicionados a `NEXO_NOTIFICATIONS_ENABLED=true` y SMTP configurado.
 
+## 2026-11-18 — Documentación por módulo y primer recaudo
+
+- [x] Catálogo con videos de los componentes reales y detalle paso a paso por tarjeta. Acceso de Superadmin, clubes globales y auditoría se sirven mediante rutas de plataforma protegidas.
+- [x] Recorrido general renovado y capítulos de configuración, disciplinas, deportistas, inscripciones y recaudos reutilizados en el modal de cada inicio de sesión del administrador.
+- [x] Pruebas del modal por sesión y del alta con correo hasta que el primer recaudo activa la inscripción.
+
 ## Siguiente fase
 
 Implementar historial de medidas, tests físicos, mesociclos, macrociclos, entrenadores y grupos de entrenamiento.

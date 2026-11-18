@@ -1,0 +1,400 @@
+[
+  {
+    "id": "acceso-roles",
+    "module": "Acceso",
+    "title": "Acceso y permisos por rol",
+    "component": "Auth/Login · Auth/VerifyEmail",
+    "roles": [
+      "Admin",
+      "Contador",
+      "Usuario",
+      "Deportista"
+    ],
+    "description": "Inicia sesión y llega al espacio que corresponde a tu cuenta.",
+    "steps": [
+      [
+        "Introduce tus credenciales",
+        "En Iniciar sesión, escribe el correo y la contraseña de tu cuenta. Usa ¿Olvidaste tu contraseña? si necesitas recuperar el acceso."
+      ],
+      [
+        "Corrige los errores de acceso",
+        "Si se rechazan las credenciales, revisa el correo y vuelve a escribir la contraseña. Si se solicita verificar el correo, abre el enlace recibido o reenvíalo desde la pantalla de verificación."
+      ],
+      [
+        "Abre tu espacio de trabajo",
+        "Admin, contador y usuario llegan al Resumen del club. Deportista entra a Mi portal si cumple las condiciones de acceso."
+      ],
+      [
+        "Comprueba el club activo",
+        "Si tu cuenta operativa tiene acceso a varios clubes, selecciona el correcto en el menú lateral antes de trabajar."
+      ]
+    ]
+  },
+  {
+    "id": "acceso-superadmin",
+    "module": "Acceso",
+    "title": "Iniciar sesión como Superadmin",
+    "component": "Auth/Login · Platform/Dashboard",
+    "roles": [
+      "Superadmin"
+    ],
+    "description": "Entra al panel global y localiza la navegación de la plataforma.",
+    "steps": [
+      [
+        "Introduce las credenciales",
+        "Escribe el correo y la contraseña de la cuenta de Superadmin. Pulsa Iniciar sesión."
+      ],
+      [
+        "Comprueba el acceso global",
+        "Verifica que el inicio de sesión abra el Resumen global. Desde ahí puedes acceder a clubes, auditoría y documentación."
+      ],
+      [
+        "Abre la administración de clubes",
+        "Selecciona Gestionar clubes para abrir el listado de clubes y las solicitudes públicas."
+      ]
+    ]
+  },
+  {
+    "id": "resumen-club",
+    "module": "Resumen",
+    "title": "Consultar el resumen del club",
+    "component": "Dashboard",
+    "roles": [
+      "Admin",
+      "Contador",
+      "Usuario"
+    ],
+    "description": "Revisa indicadores, cartera y pagos recientes del club activo.",
+    "steps": [
+      [
+        "Identifica el club activo",
+        "En el menú lateral, verifica el club seleccionado. Cambia de espacio si necesitas revisar cifras de otro club al que tengas acceso."
+      ],
+      [
+        "Lee los indicadores",
+        "Compara deportistas activos, inscripciones del mes, recaudo del mes y saldo pendiente."
+      ],
+      [
+        "Revisa los pagos recientes",
+        "Consulta la lista de deportistas con pagos recientes. Abre Recaudos para revisar el importe, el periodo y el vencimiento de los cargos."
+      ],
+      [
+        "Abre la configuración",
+        "Usa Configurar club o Ir a configuración para revisar los datos y medios de pago. Las acciones disponibles dependen de tus permisos."
+      ]
+    ]
+  },
+  {
+    "id": "clubes-global",
+    "module": "Clubes",
+    "title": "Administrar clubes desde Plataforma",
+    "component": "Platform/Dashboard · Platform/Clubs · Platform/ClubDetails",
+    "roles": [
+      "Superadmin"
+    ],
+    "description": "Supervisa la plataforma, revisa solicitudes y administra clubes y sus responsables.",
+    "steps": [
+      [
+        "Abre el panel de Plataforma",
+        "Revisa los indicadores globales y selecciona Gestionar clubes para entrar al listado y a las solicitudes."
+      ],
+      [
+        "Revisa una solicitud",
+        "Comprueba los datos del solicitante y del club. Si el correo está verificado, puedes aprobar la solicitud. Si está pendiente, reenvía la verificación. Usa Rechazar si la solicitud no procede."
+      ],
+      [
+        "Crea un club directamente",
+        "En Crear club, completa los datos del espacio y del administrador principal. Envía el formulario y consulta el acceso generado si corresponde."
+      ],
+      [
+        "Gestiona el club desde su detalle",
+        "Abre un club del listado para consultar sus disciplinas y administradores. Agrega un administrador con nombre y correo, o retira un acceso cuando proceda. El listado permite cambiar el estado del club."
+      ]
+    ]
+  },
+  {
+    "id": "club-configuracion",
+    "module": "Configuración",
+    "title": "Configurar el club y sus medios de pago",
+    "component": "Clubs/Index",
+    "roles": [
+      "Admin",
+      "Contador",
+      "Usuario"
+    ],
+    "description": "Consulta los datos del espacio activo y mantén los medios que usa el deportista para pagar.",
+    "steps": [
+      [
+        "Confirma el espacio deportivo",
+        "En Configuración, identifica el club activo. Los formularios de edición y administración aparecen según los permisos de tu cuenta."
+      ],
+      [
+        "Actualiza la información del club",
+        "Si tienes permiso, corrige el nombre, correo, ciudad o zona horaria y guarda los cambios."
+      ],
+      [
+        "Agrega un medio de pago",
+        "Elige el tipo de medio y escribe la etiqueta y los datos requeridos. Usa Agregar medio de pago y espera la confirmación."
+      ],
+      [
+        "Revisa los medios publicados",
+        "Comprueba los medios activos que estarán disponibles para los deportistas. Desactiva o retira los que ya no se usen si tienes permiso."
+      ]
+    ]
+  },
+  {
+    "id": "disciplinas",
+    "module": "Disciplinas",
+    "title": "Crear y administrar disciplinas",
+    "component": "Disciplines/Index",
+    "roles": [
+      "Admin",
+      "Contador",
+      "Usuario"
+    ],
+    "description": "Organiza las disciplinas que estarán disponibles al inscribir deportistas.",
+    "steps": [
+      [
+        "Abre Disciplinas",
+        "Consulta el listado del club activo. Revisa el estado de cada disciplina para saber si se ofrece en nuevas inscripciones."
+      ],
+      [
+        "Captura nombre y descripción",
+        "Si puedes administrar el catálogo, completa el formulario Agregar disciplina. El nombre es obligatorio y puedes incluir una descripción breve."
+      ],
+      [
+        "Crea y verifica la disciplina",
+        "Pulsa Crear disciplina, espera el progreso y verifica que la nueva fila aparezca como Activa."
+      ],
+      [
+        "Edita o cambia el estado",
+        "Usa el lápiz para editar y guardar los cambios. Usa el interruptor si quieres cambiar la disponibilidad para nuevas inscripciones."
+      ]
+    ]
+  },
+  {
+    "id": "deportistas-perfil",
+    "module": "Deportistas",
+    "title": "Registrar un deportista",
+    "component": "Athletes/Index",
+    "roles": [
+      "Admin"
+    ],
+    "description": "Crea el perfil permanente y, si aplica, configura el acceso y la primera inscripción.",
+    "steps": [
+      [
+        "Abre el alta del deportista",
+        "En Deportistas, pulsa Crear deportista. Completa nombres, apellidos y los datos de identificación disponibles."
+      ],
+      [
+        "Completa el contacto",
+        "Agrega los datos de contacto y del acudiente cuando apliquen. El correo vincula el acceso al portal. Si se omite, el perfil queda como registro interno."
+      ],
+      [
+        "Agrega datos físicos y foto",
+        "Completa las medidas, tallas o foto disponibles. Puedes dejar vacíos los datos opcionales."
+      ],
+      [
+        "Decide si inscribir al deportista",
+        "Si ya conoces la disciplina, selecciona el inicio, la periodicidad, el valor del periodo y el día de vencimiento. Si todavía no vas a inscribirlo, guarda solo el perfil."
+      ],
+      [
+        "Verifica el alta",
+        "Espera el progreso de creación y revisa el perfil en el listado. Usa Editar para actualizar los datos o el control de estado si cambia su disponibilidad."
+      ]
+    ]
+  },
+  {
+    "id": "inscripciones",
+    "module": "Inscripciones",
+    "title": "Crear y gestionar inscripciones",
+    "component": "Enrollments/Index",
+    "roles": [
+      "Admin"
+    ],
+    "description": "Asocia a un deportista con una disciplina y configura las condiciones de cobro.",
+    "steps": [
+      [
+        "Abre una nueva inscripción",
+        "En Inscripciones, pulsa Crear inscripción. El deportista y la disciplina deben estar disponibles en el club activo."
+      ],
+      [
+        "Selecciona deportista y disciplina",
+        "Busca y elige ambos registros en los selectores. Pulsa Continuar para configurar el cobro."
+      ],
+      [
+        "Define las condiciones de cobro",
+        "Selecciona la fecha de inicio, completa el valor de la mensualidad y revisa el día de vencimiento."
+      ],
+      [
+        "Guarda y revisa el estado",
+        "Pulsa Crear inscripción y espera la confirmación. La inscripción empieza Pendiente. Si la creaste por separado, usa Activar inscripción y confirma para que se genere el cargo cuando corresponda. Si el alta del deportista ya generó un cargo, el pago puede activar la inscripción pendiente."
+      ]
+    ]
+  },
+  {
+    "id": "mensualidades-cobros",
+    "module": "Recaudos",
+    "title": "Registrar pagos y revisar comprobantes",
+    "component": "Memberships/Index",
+    "roles": [
+      "Admin",
+      "Contador"
+    ],
+    "description": "Consulta cargos, registra pagos recibidos y tramita comprobantes enviados por deportistas.",
+    "steps": [
+      [
+        "Consulta los cargos",
+        "En Recaudos, usa los estados disponibles para encontrar el cargo. Verifica el deportista, la disciplina, el periodo, el vencimiento y el importe."
+      ],
+      [
+        "Revisa el soporte recibido",
+        "En Comprobantes enviados, abre el soporte y contrástalo con el movimiento recibido. Si el pago se recibió directamente en efectivo, usa Registrar pago en el cargo."
+      ],
+      [
+        "Resuelve la revisión",
+        "Pulsa Aprobar y confirma con Aprobar y registrar si corresponde. Si hay una inconsistencia, rechaza el comprobante e informa el motivo para que el deportista pueda volver a enviarlo."
+      ],
+      [
+        "Confirma el resultado",
+        "Comprueba el estado del cargo y del comprobante. El pago puede reactivar una inscripción pendiente o suspendida."
+      ]
+    ]
+  },
+  {
+    "id": "equipo-permisos",
+    "module": "Equipo",
+    "title": "Administrar el equipo del club",
+    "component": "ClubMembers/Index",
+    "roles": [
+      "Admin"
+    ],
+    "description": "Agrega cuentas operativas al club y administra sus accesos.",
+    "steps": [
+      [
+        "Revisa el equipo",
+        "Abre Equipo en el club activo. Consulta el rol y estado de cada cuenta vinculada."
+      ],
+      [
+        "Captura el acceso",
+        "Completa el nombre y correo de la persona. Indica la contraseña cuando corresponda crear una cuenta nueva."
+      ],
+      [
+        "Asigna el rol y guarda",
+        "Selecciona el rol operativo requerido y pulsa Agregar al club. Espera la confirmación y localiza el miembro en el listado."
+      ],
+      [
+        "Mantén los permisos",
+        "Para las cuentas editables puedes cambiar el rol o el estado. Si alguien deja el equipo, usa Retirar miembro y confirma. Su cuenta puede seguir vinculada a otros clubes."
+      ]
+    ]
+  },
+  {
+    "id": "portal-deportista",
+    "module": "Portal",
+    "title": "Consultar Mi portal y actualizar mis datos",
+    "component": "Athletes/Portal",
+    "roles": [
+      "Deportista"
+    ],
+    "description": "Consulta tu perfil, inscripciones y pagos desde tu espacio privado.",
+    "steps": [
+      [
+        "Abre Mi portal",
+        "Entra con tu cuenta de deportista. El acceso requiere la cuenta y el perfil activos, una inscripción activa y un recaudo pagado cuyo periodo cubra la fecha actual."
+      ],
+      [
+        "Consulta tus inscripciones",
+        "Revisa disciplina, vigencia y cargos de tus inscripciones. Los indicadores de entrenamiento son de demostración."
+      ],
+      [
+        "Actualiza tus datos personales",
+        "Abre el formulario de datos personales y actualiza los datos habilitados. Guarda y revisa el resultado en el perfil."
+      ],
+      [
+        "Continúa a Mis pagos",
+        "Usa Mis pagos para consultar tus cargos, los medios habilitados y el historial de pagos."
+      ]
+    ]
+  },
+  {
+    "id": "mensualidades-comprobante",
+    "module": "Mis pagos",
+    "title": "Enviar un comprobante de pago",
+    "component": "Athletes/Payments · ReceiptUpload",
+    "roles": [
+      "Deportista"
+    ],
+    "description": "Revisa un cargo y envía el soporte para que el club confirme tu pago.",
+    "steps": [
+      [
+        "Identifica el cargo",
+        "En Mis pagos, busca el periodo pendiente y verifica el valor y la fecha de vencimiento."
+      ],
+      [
+        "Paga con un medio habilitado",
+        "Revisa los datos en Medios del club. Después de pagar, selecciona en el formulario el medio que usaste y agrega una referencia si la tienes."
+      ],
+      [
+        "Adjunta el comprobante",
+        "Selecciona el archivo del pago y verifica que quede adjunto. Pulsa Enviar comprobante y espera la confirmación."
+      ],
+      [
+        "Revisa el estado del envío",
+        "El comprobante queda pendiente de revisión hasta que el club lo apruebe. Si se rechaza, consulta el motivo y envía un soporte corregido."
+      ]
+    ]
+  },
+  {
+    "id": "auditoria-operaciones",
+    "module": "Auditoría",
+    "title": "Consultar la auditoría de operaciones",
+    "component": "Platform/AuditLogs",
+    "roles": [
+      "Superadmin"
+    ],
+    "description": "Identifica quién ejecutó una operación y en qué club se registró.",
+    "steps": [
+      [
+        "Abre Auditoría desde Plataforma",
+        "Entra con el rol Superadmin y selecciona Logs de auditoría en la navegación global."
+      ],
+      [
+        "Identifica el evento",
+        "Localiza la fecha, acción, usuario, club y entidad afectada. El historial incluye accesos y operaciones registradas."
+      ],
+      [
+        "Consulta el detalle visible",
+        "Lee los datos resumidos de la operación y la dirección IP cuando esté disponible. Usa la paginación para revisar otros registros."
+      ]
+    ]
+  },
+  {
+    "id": "perfil-cuenta",
+    "module": "Mi perfil",
+    "title": "Actualizar el perfil y la contraseña",
+    "component": "Profile/Edit",
+    "roles": [
+      "Superadmin",
+      "Admin",
+      "Contador",
+      "Usuario",
+      "Deportista"
+    ],
+    "description": "Mantén actualizados los datos y la seguridad de tu cuenta.",
+    "steps": [
+      [
+        "Abre Mi perfil",
+        "En el menú de tu cuenta, selecciona Mi perfil. Revisa los datos asociados a tu acceso."
+      ],
+      [
+        "Guarda tus datos",
+        "Actualiza el nombre o correo y pulsa Guardar. Si el sistema solicita volver a verificar el correo, sigue el enlace enviado."
+      ],
+      [
+        "Cambia la contraseña",
+        "Escribe la contraseña actual, la nueva y su confirmación en el formulario de seguridad. Guarda y revisa los mensajes debajo de cada campo."
+      ]
+    ]
+  }
+]

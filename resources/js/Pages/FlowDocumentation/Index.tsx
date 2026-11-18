@@ -1,46 +1,105 @@
+import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react';
+import { Head, usePage } from '@inertiajs/react';
+import { ArrowUpRight, PlayCircle, X } from 'lucide-react';
+import { useState } from 'react';
+import { PendingVideo, VideoFrame, type VideoAsset } from '@/Components/FlowVideo';
+import GuideSteps from '@/Components/GuideSteps';
+import { SearchableSelect } from '@/Components/ui/searchable-select';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import PlatformLayout from '@/Layouts/PlatformLayout';
-import { SearchableSelect } from '@/Components/ui/searchable-select';
-import { Head, usePage } from '@inertiajs/react';
-import { BookOpen, Filter, PlayCircle, ShieldCheck, Video } from 'lucide-react';
-import { useMemo, useState } from 'react';
+export type Guide = { id: string; module: string; title: string; description: string; component: string; roles: string[]; steps: [string, string][] };
+const options = (values: string[]) => ['Todos', ...new Set(values)].map((label) => ({ id: label, label }));
 
-type Role = 'Todos' | 'Superadmin' | 'Admin' | 'Contador' | 'Usuario' | 'Deportista';
-type DocItem = { title: string; module: string; component: string; roles: Exclude<Role, 'Todos'>[]; description: string; video?: string; duration?: string };
-
-const roles: Role[] = ['Todos', 'Superadmin', 'Admin', 'Contador', 'Usuario', 'Deportista'];
-const modules = ['Todos', 'Acceso', 'Clubes', 'Deportistas', 'Inscripciones', 'Mensualidades', 'Equipo', 'Portal', 'Auditoría'];
-const docs: DocItem[] = [
-    { title: 'Acceso y permisos por rol', module: 'Acceso', component: 'Login y redirección', roles: ['Superadmin', 'Admin', 'Contador', 'Usuario', 'Deportista'], description: 'Inicio de sesión, verificación y llegada al espacio correcto según el rol.', video: '/flow-videos/acceso-roles.mp4', duration: '00:12' },
-    { title: 'Administración global de clubes', module: 'Clubes', component: 'Platform Dashboard', roles: ['Superadmin'], description: 'Gestionar clubes, administradores y estado de la plataforma.', video: '/flow-videos/clubes-global.mp4', duration: '00:12' },
-    { title: 'Configuración del club', module: 'Clubes', component: 'Club Configuration', roles: ['Admin', 'Contador'], description: 'Información, disciplinas, zona horaria y medios de pago.', video: '/flow-videos/club-configuracion.mp4', duration: '00:12' },
-    { title: 'Crear perfil de deportista', module: 'Deportistas', component: 'Athlete Onboarding', roles: ['Admin'], description: 'Identidad, contacto, avatar, datos físicos y creación de acceso.', video: '/flow-videos/deportistas-perfil.mp4', duration: '00:12' },
-    { title: 'Gestionar inscripciones', module: 'Inscripciones', component: 'Enrollment Onboarding', roles: ['Admin', 'Contador'], description: 'Asociar deportista y disciplina, configurar tarifa y activar la inscripción.', video: '/flow-videos/inscripciones.mp4', duration: '00:12' },
-    { title: 'Cobros y pagos', module: 'Mensualidades', component: 'Billing Console', roles: ['Admin', 'Contador'], description: 'Consultar cargos, registrar pagos, revisar comprobantes y reactivar inscripciones.', video: '/flow-videos/mensualidades-cobros.mp4', duration: '00:12' },
-    { title: 'Enviar comprobante', module: 'Mensualidades', component: 'Athlete Payment Upload', roles: ['Deportista'], description: 'Consultar vencimiento, elegir medio de pago y enviar el soporte al club.', video: '/flow-videos/mensualidades-comprobante.mp4', duration: '00:12' },
-    { title: 'Equipo y permisos', module: 'Equipo', component: 'Club Members', roles: ['Admin'], description: 'Agregar usuarios operativos y mantener el aislamiento por club.', video: '/flow-videos/equipo-permisos.mp4', duration: '00:12' },
-    { title: 'Mi portal y perfil', module: 'Portal', component: 'Athlete Portal', roles: ['Deportista'], description: 'Consultar progreso, perfil vinculado, mensualidades e historial de pagos.', video: '/flow-videos/portal-deportista.mp4', duration: '00:12' },
-    { title: 'Auditoría de operaciones', module: 'Auditoría', component: 'Audit Logs', roles: ['Superadmin', 'Admin'], description: 'Consultar quién ejecutó una operación, en qué club y qué cambió.', video: '/flow-videos/auditoria-operaciones.mp4', duration: '00:12' },
-];
-
-export default function Index() {
-    const page = usePage().props as { platformAccess?: { isSuperadmin?: boolean }; auth: { user: { role?: string } | null } };
-    const Layout = page.platformAccess?.isSuperadmin || page.auth.user?.role === 'superadmin' ? PlatformLayout : AuthenticatedLayout;
-    const [role, setRole] = useState<Role>('Todos');
+export default function Index({ guides, videos }: { guides: Guide[]; videos: Record<string, VideoAsset | null> }) {
+    const { platformAccess, auth } = usePage<{ platformAccess?: { isSuperadmin?: boolean }; auth: { user: import('@/types').User & { role?: string } } }>().props;
+    const Layout = platformAccess?.isSuperadmin || auth.user?.role === 'superadmin' ? PlatformLayout : AuthenticatedLayout;
+    const [role, setRole] = useState('Todos');
     const [module, setModule] = useState('Todos');
-    const visibleDocs = useMemo(() => docs.filter((item) => (role === 'Todos' || item.roles.includes(role)) && (module === 'Todos' || item.module === module)), [role, module]);
+    const [selected, setSelected] = useState<Guide | null>(null);
+    const roles = options(guides.flatMap((guide) => guide.roles));
+    const modules = options(guides.map((guide) => guide.module));
+    const visible = guides.filter((guide) => (role === 'Todos' || guide.roles.includes(role)) && (module === 'Todos' || guide.module === module));
 
-    return <Layout header={<div><p className="nexo-eyebrow">Ayuda global</p><h1 className="mt-1 text-xl font-bold tracking-tight sm:text-2xl">Documentación</h1></div>}>
-        <Head title="Documentación global" />
-        <section className="mx-auto max-w-[1400px] space-y-6"><div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end"><div><p className="text-3xl font-extrabold tracking-tight sm:text-4xl">Centro de flujos</p><p className="mt-2 max-w-3xl text-sm text-slate-400">Guías visuales de cada rol, módulo y componente de NEXO CLUB. Los videos se publican únicamente cuando su render está disponible.</p></div><div className="flex items-center gap-2 rounded-xl border border-slate-800 bg-nexo-surface px-3 py-2 text-xs text-slate-400"><ShieldCheck size={15} className="text-nexo-lime" /> Disponible para todos los roles</div></div>
-            <div className="nexo-card flex flex-col gap-4 p-5 lg:flex-row lg:items-center"><div className="flex items-center gap-2 text-sm font-semibold"><Filter size={17} className="text-nexo-lime" /> Filtrar documentación</div><div className="flex flex-1 flex-wrap gap-2">{roles.map((item) => <button key={item} type="button" onClick={() => setRole(item)} className={`rounded-xl px-3 py-2 text-xs font-semibold ${role === item ? 'bg-nexo-lime text-nexo-ink' : 'border border-slate-700 text-slate-400 hover:text-white'}`}>{item}</button>)}</div><div className="w-full lg:w-64"><SearchableSelect value={module} options={modules.map((item) => ({ id: item, label: item }))} onValueChange={setModule} searchPlaceholder="Buscar módulo..." /></div></div>
-            <div className="nexo-card overflow-hidden"><div className="flex items-start gap-4 border-b border-slate-800 p-6"><div className="rounded-2xl bg-nexo-lime/10 p-3 text-nexo-lime"><BookOpen size={22} /></div><div><h2 className="text-xl font-bold">Recorrido general</h2><p className="mt-1 text-sm text-slate-400">Video consolidado de la operación principal. Los recorridos individuales aparecen abajo.</p></div></div><div className="p-5 sm:p-6"><VideoFrame src="/flow-videos/nexo-flujos.mp4" title="Recorrido general de NEXO CLUB" duration="00:24" /><p className="mt-3 text-xs text-slate-500">Fuente: <code className="text-nexo-lime">resources/hyperframes/flows/index.html</code>. El render local se genera con <code className="text-nexo-lime">npm run videos:render</code>.</p></div></div>
-            <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">{visibleDocs.map((item) => <DocCard key={`${item.module}-${item.component}`} item={item} />)}</div>{visibleDocs.length === 0 && <div className="nexo-card p-12 text-center text-sm text-slate-500">No hay documentación para los filtros seleccionados.</div>}
-            <div className="rounded-2xl border border-dashed border-slate-700 bg-slate-900/30 p-5 text-sm text-slate-400"><div className="flex items-center gap-2 font-semibold text-slate-200"><Video size={16} className="text-nexo-lime" /> Estado de producción audiovisual</div><p className="mt-2">El catálogo actual cuenta con un recorrido general y 10 Hyperframes individuales, uno por flujo, módulo y componente. Todos los videos publicados están asociados a su guía; los futuros flujos deben permanecer como “Video en producción” hasta contar con un MP4 real.</p></div>
-        </section>
-    </Layout>;
+    return (
+        <Layout header={<div><p className="nexo-eyebrow">Ayuda global</p><h1 className="mt-1 text-xl font-bold sm:text-2xl">Documentación</h1></div>}>
+            <Head title="Documentación" />
+            <section className="mx-auto max-w-[1400px] space-y-6">
+                <div>
+                    <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Guías de NEXO CLUB</h2>
+                    <p className="mt-2 text-sm text-slate-400">Abre una guía para ver el recorrido y seguir los pasos en tu club.</p>
+                </div>
+                <details
+                    className="nexo-card overflow-hidden"
+                    data-tour="documentation-video"
+                    onToggle={(event) => {
+                        if (!event.currentTarget.open) event.currentTarget.querySelector('video')?.pause();
+                    }}
+                >
+                    <summary className="flex min-h-14 cursor-pointer list-none items-center gap-3 p-4 font-bold focus-visible:outline focus-visible:outline-nexo-lime sm:p-5">
+                        <PlayCircle size={22} className="text-nexo-lime" /> Recorrido general
+                    </summary>
+                    <div className="border-t border-slate-800 p-4 sm:p-5">
+                        <VideoFrame asset={videos['nexo-flujos'] ?? undefined} title="Recorrido general de NEXO CLUB" />
+                    </div>
+                </details>
+                <div className="grid gap-3 sm:grid-cols-2 lg:max-w-xl" data-tour="documentation-filters">
+                    <div>
+                        <span id="documentation-role" className="mb-2 block text-sm font-semibold text-slate-300">Rol</span>
+                        <SearchableSelect ariaLabelledBy="documentation-role" value={role} options={roles} onValueChange={setRole} searchPlaceholder="Buscar rol..." />
+                    </div>
+                    <div>
+                        <span id="documentation-module" className="mb-2 block text-sm font-semibold text-slate-300">Módulo</span>
+                        <SearchableSelect ariaLabelledBy="documentation-module" value={module} options={modules} onValueChange={setModule} searchPlaceholder="Buscar módulo..." />
+                    </div>
+                </div>
+                <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3" data-tour="documentation-guides">
+                    {visible.map((guide) => (
+                        <button key={guide.id} type="button" onClick={() => setSelected(guide)} className="group nexo-card flex w-full flex-col overflow-hidden text-left hover:border-nexo-lime/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-nexo-lime">
+                            <div className="relative flex aspect-video w-full items-center justify-center overflow-hidden bg-nexo-ink">
+                                {videos[guide.id]?.poster && <img src={videos[guide.id]?.poster ?? undefined} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />}
+                                {videos[guide.id] ? <PlayCircle size={42} className="relative rounded-full bg-nexo-ink/90 p-1 text-nexo-lime" /> : <PendingVideo />}
+                            </div>
+                            <div className="flex flex-1 flex-col p-5">
+                                <span className="nexo-eyebrow text-nexo-lime">{guide.module}</span>
+                                <span className="mt-2 text-lg font-bold">{guide.title}</span>
+                                <span className="mt-2 flex-1 text-sm leading-6 text-slate-400">{guide.description}</span>
+                                <span className="mt-4 text-xs text-slate-400">{guide.roles.join(' · ')}</span>
+                                <span className="mt-4 flex items-center gap-2 text-sm font-semibold text-nexo-lime">Ver guía <ArrowUpRight size={16} /></span>
+                            </div>
+                        </button>
+                    ))}
+                </div>
+                {visible.length === 0 && <p className="nexo-card p-8 text-center text-sm text-slate-400" role="status">No hay guías que coincidan con estos filtros.</p>}
+            </section>
+            {selected && <GuideDialog guide={selected} asset={videos[selected.id] ?? undefined} onClose={() => setSelected(null)} />}
+        </Layout>
+    );
 }
 
-function DocCard({ item }: { item: DocItem }) { return <article className="group nexo-card overflow-hidden transition hover:-translate-y-1 hover:border-nexo-lime/50"><VideoFrame src={item.video} title={item.title} duration={item.duration} /><div className="p-5"><div className="flex items-start justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-nexo-lime">{item.module}</p><h3 className="mt-2 font-bold">{item.title}</h3></div>{item.video ? <PlayCircle size={18} className="shrink-0 text-nexo-lime" /> : <span className="shrink-0 rounded-full bg-amber-400/10 px-2 py-1 text-[10px] font-bold text-amber-300">Pendiente</span>}</div><p className="mt-2 text-sm leading-6 text-slate-400">{item.description}</p><div className="mt-4 flex flex-wrap gap-2"><span className="rounded-lg bg-slate-900/70 px-2 py-1 text-[11px] text-slate-400">{item.component}</span>{item.roles.map((itemRole) => <span key={itemRole} className="rounded-lg bg-slate-900/70 px-2 py-1 text-[11px] text-slate-500">{itemRole}</span>)}</div></div></article>; }
-
-function VideoFrame({ src, title, duration }: { src?: string; title: string; duration?: string }) { return <div className="relative aspect-video overflow-hidden bg-slate-950">{src ? <video aria-label={title} controls preload="metadata" className="h-full w-full object-cover opacity-85 transition duration-300 group-hover:scale-105 group-hover:opacity-100" src={src}><track kind="captions" /></video> : <div className="flex h-full flex-col items-center justify-center gap-3 bg-gradient-to-br from-slate-900 to-slate-950 text-center" aria-label={`${title}: video en producción`}><div className="rounded-2xl bg-amber-400/10 p-4 text-amber-300"><Video size={28} /></div><p className="text-sm font-semibold text-slate-300">Video en producción</p><p className="px-6 text-xs text-slate-500">El Hyperframe de este flujo aún no está renderizado.</p></div>}{duration && <span className="absolute bottom-3 right-3 rounded-lg bg-nexo-ink/85 px-2 py-1 text-[11px] font-bold text-white">{duration}</span>}</div>; }
+function GuideDialog({ guide, asset, onClose }: { guide: Guide; asset?: VideoAsset; onClose: () => void }) {
+    return (
+        <Dialog open data-native-scroll-dialog onClose={onClose} className="relative z-[110]">
+            <DialogBackdrop className="fixed inset-0 bg-nexo-ink/85 backdrop-blur-sm" />
+            <div className="fixed inset-0 flex items-end justify-center sm:items-center sm:p-5">
+                <DialogPanel className="max-h-[94dvh] w-full max-w-4xl overflow-y-auto rounded-t-3xl border border-slate-700 bg-nexo-surface text-slate-100 shadow-2xl sm:rounded-3xl">
+                    <header className="sticky top-0 z-10 flex items-start justify-between gap-3 border-b border-slate-800 bg-nexo-surface p-4 sm:p-6">
+                        <div>
+                            <p className="nexo-eyebrow text-nexo-lime">{guide.module}</p>
+                            <DialogTitle className="mt-1 text-xl font-extrabold sm:text-2xl">{guide.title}</DialogTitle>
+                        </div>
+                        <button type="button" data-autofocus onClick={onClose} aria-label="Cerrar guía" className="grid h-11 w-11 shrink-0 place-items-center rounded-xl text-slate-300 hover:bg-slate-800 focus-visible:outline focus-visible:outline-nexo-lime"><X size={21} /></button>
+                    </header>
+                    <div className="space-y-5 p-4 sm:p-6">
+                        <p className="text-sm text-slate-300">{guide.description}</p>
+                        <dl className="flex flex-wrap gap-x-8 gap-y-2 text-sm">
+                            <div><dt className="font-semibold text-slate-200">Roles</dt><dd className="text-slate-400">{guide.roles.join(' · ')}</dd></div>
+                            <div><dt className="font-semibold text-slate-200">Componentes</dt><dd className="text-slate-400">{guide.component}</dd></div>
+                        </dl>
+                        <VideoFrame asset={asset} title={guide.title} />
+                        <GuideSteps steps={guide.steps} />
+                    </div>
+                </DialogPanel>
+            </div>
+        </Dialog>
+    );
+}

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>NEXO CLUB · Crear y administrar disciplinas</title>
+    <link rel="stylesheet" href="../.preview/preview.css">
+    <style>
+        html, body { width: 1280px; height: 720px; margin: 0; overflow: hidden; }
+        *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+        #app main { padding-bottom: 130px; }
+        #guide-footer { position: fixed; z-index: 400; display: grid; grid-template-columns: 280px 1fr; gap: 24px; align-items: center; inset: auto 18px 14px; min-height: 88px; padding: 12px 22px 14px; border-radius: 16px; border: 1px solid #425565; background: #0b1220; box-shadow: 0 8px 24px #03071099; }
+        #guide-section { color: #b8f34b; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .12em; }
+        #guide-title { color: #f8fafc; font-size: 19px; font-weight: 800; line-height: 1.2; margin-top: 4px; }
+        #guide-caption { color: #cbd5e1; font-size: 16px; line-height: 1.35; }
+        #guide-progress { position: absolute; bottom: 0; left: 15px; width: calc(100% - 30px); height: 3px; border-radius: 8px; background: #b8f34b; transform-origin: left; }
+        #guide-cursor, #guide-click { position: fixed; z-index: 500; left: -11px; top: -11px; width: 22px; height: 22px; border: 2px solid #fff; border-radius: 50%; box-shadow: 0 0 0 4px #b8f34b80, 0 3px 8px #000; pointer-events: none; }
+        #guide-click { left: -21px; top: -21px; width: 42px; height: 42px; border-color: #b8f34b; opacity: 0; }
+    </style>
+</head>
+<body>
+    <div data-composition-id="disciplinas" data-width="1280" data-height="720" data-duration="47">
+        <div id="app"></div>
+        <aside id="guide-footer">
+            <div><p id="guide-section"></p><h1 id="guide-title"></h1></div>
+            <p id="guide-caption"></p>
+            <div id="guide-progress"></div>
+        </aside>
+        <div id="guide-click"></div>
+        <div id="guide-cursor"></div>
+    </div>
+    <script>
+        { const NativeDate = Date, fixed = '2026-11-18T15:00:00Z';
+          window.Date = class extends NativeDate {
+              constructor(...args) { super(...(args.length ? args : [fixed])); }
+          }; }
+    </script>
+    <script src="../.preview/preview.js"></script>
+</body>
+</html>

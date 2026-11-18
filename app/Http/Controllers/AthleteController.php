@@ -76,15 +76,6 @@ class AthleteController extends Controller
                 'due_day' => ['required', 'integer', 'min:1', 'max:31'],
             ])->validate();
         }
-        if (filled($data['email'] ?? null)) {
-            $existingUserQuery = User::where('email', $data['email']);
-            if ($athlete->user_id) {
-                $existingUserQuery->whereKeyNot($athlete->user_id);
-            }
-            if ($existingUserQuery->exists()) {
-                return back()->withErrors(['email' => 'Este correo ya pertenece a otra cuenta. Usa otro correo o solicita una vinculación manual.'])->withInput();
-            }
-        }
         $photo = $request->file('photo');
         unset($data['photo']);
         $enrollmentData = array_intersect_key($data, array_flip(['discipline_id', 'start_date', 'billing_frequency', 'monthly_amount', 'due_day']));

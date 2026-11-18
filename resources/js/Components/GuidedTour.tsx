@@ -90,7 +90,8 @@ const flowSteps: Record<string, TourStep[]> = {
     ],
     'FlowDocumentation/Index': [
         { target: 'documentation-filters', title: 'Filtrar flujos', description: 'Busca la guía por rol o módulo usando los filtros disponibles.' },
-        { target: 'documentation-video', title: 'Recorrido visual', description: 'Reproduce el video general o el recorrido individual cuando ya esté publicado.' },
+        { target: 'documentation-video', title: 'Recorrido visual', description: 'Abre el recorrido general para conocer la operación de NEXO CLUB.' },
+        { target: 'documentation-guides', title: 'Abre una guía', description: 'Cada tarjeta contiene el video y el paso a paso de su módulo.' },
     ],
 };
 
@@ -191,10 +192,21 @@ export default function GuidedTour() {
     useEffect(() => {
         if (!tour || completedTours.includes(tour.key) || autoStartedTour.current === tour.key) return;
 
-        autoStartedTour.current = tour.key;
-        const timeout = window.setTimeout(start, 350);
-
-        return () => window.clearTimeout(timeout);
+        let timeout: number | undefined;
+        const schedule = () => {
+            clearTimeout(timeout);
+            timeout = window.setTimeout(() => {
+                if (document.querySelector('[data-club-onboarding]')) return;
+                autoStartedTour.current = tour.key;
+                start();
+            }, 350);
+        };
+        schedule();
+        document.addEventListener('nexo:club-onboarding-closed', schedule);
+        return () => {
+            clearTimeout(timeout);
+            document.removeEventListener('nexo:club-onboarding-closed', schedule);
+        };
     }, [completedTours, start, tour]);
 
     if (!tour) return null;

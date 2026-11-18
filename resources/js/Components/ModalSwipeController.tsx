@@ -6,6 +6,7 @@ import { useEffect } from 'react';
  */
 export default function ModalSwipeController() {
     useEffect(() => {
+        const swipeDialogs = '[role="dialog"]:not([data-native-scroll-dialog])';
         let active: { dialog: HTMLElement; panel: HTMLElement; startY: number; currentY: number } | null = null;
         const closing = new WeakSet<HTMLElement>();
 
@@ -55,7 +56,7 @@ export default function ModalSwipeController() {
             if (window.innerWidth >= 640) return;
 
             const target = event.target instanceof Element ? event.target : null;
-            const dialog = target?.closest<HTMLElement>('[role="dialog"]');
+            const dialog = target?.closest<HTMLElement>(swipeDialogs);
             const panel = dialog ? panelFor(dialog) : null;
             if (!dialog || !panel) return;
             setCollapsed(dialog);
@@ -104,7 +105,7 @@ export default function ModalSwipeController() {
         const onClick = (event: MouseEvent) => {
             if (window.innerWidth >= 640) return;
             const target = event.target instanceof Element ? event.target : null;
-            const dialog = target?.closest<HTMLElement>('[role="dialog"]');
+            const dialog = target?.closest<HTMLElement>(swipeDialogs);
             const panel = dialog ? panelFor(dialog) : null;
             if (!dialog || !panel) return;
 
@@ -124,10 +125,10 @@ export default function ModalSwipeController() {
 
         const observer = new MutationObserver(() => {
             if (window.innerWidth >= 640) return;
-            document.querySelectorAll<HTMLElement>('[role="dialog"]').forEach(setCollapsed);
+            document.querySelectorAll<HTMLElement>(swipeDialogs).forEach(setCollapsed);
         });
         observer.observe(document.body, { childList: true, subtree: true });
-        document.querySelectorAll<HTMLElement>('[role="dialog"]').forEach(setCollapsed);
+        document.querySelectorAll<HTMLElement>(swipeDialogs).forEach(setCollapsed);
 
         document.addEventListener('pointerdown', onPointerDown, true);
         document.addEventListener('pointermove', onPointerMove, { capture: true, passive: false });

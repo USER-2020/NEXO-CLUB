@@ -99,6 +99,76 @@ class MultiClubTest extends TestCase
         $this->actingAs($superadmin)->get(route('dashboard'))->assertRedirect(route('platform.dashboard'));
     }
 
+    public function test_club_onboarding_opens_once_after_each_successful_admin_login(): void
+    {
+        [$admin, $club] = $this->makeUserWithClubs();
+        app(PermissionRegistrar::class)->setPermissionsTeamId($club->id);
+        Role::create(['name' => 'admin', 'guard_name' => 'web', 'team_id' => $club->id]);
+        $admin->syncRoles(['admin']);
+
+        $login = ['email' => $admin->email, 'password' => 'password'];
+
+        $this->post('/login', $login)->assertRedirect(route('dashboard', absolute: false));
+        $this->get(route('dashboard'))->assertInertia(fn ($page) => $page
+            ->component('Dashboard')
+            ->has('onboardingChapters', 5)
+            ->where('onboardingChapters.0.animation', fn ($url) => str_contains($url, '/flow-videos/club-configuracion.gif'))
+            ->where('onboardingChapters.4.animation', fn ($url) => str_contains($url, '/flow-videos/mensualidades-cobros.gif')));
+        $this->get(route('dashboard'))->assertInertia(fn ($page) => $page
+            ->component('Dashboard')
+            ->where('onboardingChapters', []));
+
+        $this->post('/logout')->assertRedirect('/');
+        $this->post('/login', $login)->assertRedirect(route('dashboard', absolute: false));
+        $this->get(route('dashboard'))->assertInertia(fn ($page) => $page
+            ->component('Dashboard')
+            ->has('onboardingChapters', 5));
+    }
+
+    public function test_club_onboarding_stays_hidden_for_operational_users_without_admin_role(): void
+    {
+        [$user] = $this->makeUserWithClubs();
+
+        $this->post('/login', ['email' => $user->email, 'password' => 'password'])->assertRedirect();
+        $this->get(route('dashboard'))->assertInertia(fn ($page) => $page
+            ->component('Dashboard')
+            ->where('onboardingChapters', []));
+    }
+
+    public function test_first_athlete_with_email_can_be_enrolled_and_have_the_initial_charge_paid(): void
+    {
+        [$admin, $club] = $this->makeUserWithClubs();
+        app(PermissionRegistrar::class)->setPermissionsTeamId($club->id);
+        Role::create(['name' => 'admin', 'guard_name' => 'web', 'team_id' => $club->id]);
+        $admin->syncRoles(['admin']);
+        $discipline = $club->disciplines()->create(['name' => 'Natación', 'is_active' => true]);
+
+        $this->actingAs($admin)->post(route('athletes.store'), [
+            'first_name' => 'Lucía',
+            'last_name' => 'Ríos',
+            'document_type' => 'cedula_ciudadania',
+            'email' => 'deportista@example.test',
+            'discipline_id' => $discipline->id,
+            'start_date' => today()->toDateString(),
+            'billing_frequency' => 'monthly',
+            'monthly_amount' => 85000,
+            'due_day' => today()->day,
+        ])->assertRedirect()->assertSessionHasNoErrors();
+
+        $athlete = $club->athletes()->sole();
+        $this->assertNotNull($athlete->user_id);
+        $enrollment = $athlete->enrollments()->sole();
+        $charge = $enrollment->charges()->sole();
+        $this->assertSame('pending', $enrollment->status);
+        $this->assertSame('pending', $charge->status);
+
+        $this->post(route('memberships.pay', $charge), ['method' => 'cash'])
+            ->assertRedirect()->assertSessionHasNoErrors();
+
+        $this->assertSame('paid', $charge->fresh()->status);
+        $this->assertSame('active', $enrollment->fresh()->status);
+    }
+
     private function makeUserWithClubs(): array
     {
         $clubA = Club::create(['name' => 'Club A', 'slug' => 'club-a', 'timezone' => 'America/Bogota']);

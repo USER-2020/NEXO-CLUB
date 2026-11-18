@@ -28,7 +28,7 @@ export default function FlashToasts() {
     }, []);
 
     useEffect(() => {
-        if (flash.athleteAccess) {
+        if (flash.athleteAccess && !operationActive) {
             toast.success(`Acceso creado para ${flash.athleteAccess.name}. Correo: ${flash.athleteAccess.email} · Contraseña temporal: ${flash.athleteAccess.password}`, {
                 duration: 12000,
                 iconTheme: { primary: '#B8F34B', secondary: '#07111F' },
@@ -39,7 +39,7 @@ export default function FlashToasts() {
             });
         }
 
-        if (flash.error) {
+        if (flash.error && !operationActive) {
             toast.error(flash.error);
         }
 
