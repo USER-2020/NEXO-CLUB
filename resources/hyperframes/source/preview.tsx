@@ -36,6 +36,8 @@ const stage = document.querySelector<HTMLElement>('[data-composition-id]')!;
 const composition = stage.dataset.compositionId!;
 const host = document.getElementById('app')!;
 const preview = createRoot(host);
+const matchMedia = window.matchMedia.bind(window);
+window.matchMedia = (query) => matchMedia(query === '(prefers-reduced-motion: reduce)' ? '(min-width: 0px)' : query);
 const previewOps: Record<string, Operation> = {
     'platform.clubs.store': 'club', 'clubs.payment-methods.store': 'payment_method', 'disciplines.store': 'discipline',
     'athletes.store': 'athlete', 'enrollments.store': 'enrollment', 'club-members.store': 'member',
@@ -159,7 +161,8 @@ setPreviewVisit((verb, url, data, done) => {
         return;
     }
 
-    const operation = previewOps[name];
+    const paidOnboarding = name === 'athletes.store' && data.initial_charge_mode === 'paid';
+    const operation = paidOnboarding ? 'athlete_with_payment' : previewOps[name];
     shownPhase = 0;
     flash = {};
     toast.remove();
@@ -184,20 +187,64 @@ setPreviewVisit((verb, url, data, done) => {
                 page.paymentMethods = [{ ...method, ...data, is_active: true }];
                 success = 'Medio de pago agregado correctamente.';
                 break;
-            case 'disciplines.store':
-                page.disciplines = pageList([...page.disciplines.data, { ...discipline, ...data, id: 2 }]);
+            case 'disciplines.store': {
+                const createdDiscipline = { ...discipline, ...data, id: 2 };
+                page.disciplines = pageList([...page.disciplines.data, createdDiscipline]);
+                props['athletes.index'].disciplines.push(createdDiscipline);
+                props['enrollments.index'].disciplines.push(createdDiscipline);
                 success = 'Disciplina creada correctamente.';
                 break;
+            }
             case 'disciplines.update':
             case 'disciplines.toggle':
                 page.disciplines = pageList(page.disciplines.data.map((item: typeof discipline) => item.id === 2
                     ? { ...item, ...data, is_active: name.endsWith('toggle') ? !item.is_active : item.is_active } : item));
                 success = name.endsWith('toggle') ? 'Disciplina desactivada.' : 'Disciplina actualizada correctamente.';
                 break;
-            case 'athletes.store':
-                page.athletes = pageList([{ ...athlete, ...data, active_enrollments_count: 0 }]);
-                success = 'Deportista registrado correctamente.';
+            case 'athletes.store': {
+                const createdAthlete = { ...athlete, ...data, active_enrollments_count: paidOnboarding ? 1 : 0 };
+                page.athletes = pageList([...page.athletes.data, createdAthlete]);
+                props['enrollments.index'].athletes.push(createdAthlete);
+                const selectedDiscipline = page.disciplines.find((item: typeof discipline) => item.id === Number(data.discipline_id));
+                if (selectedDiscipline) {
+                    const start = paidOnboarding ? date : data.start_date;
+                    const createdEnrollment = {
+                        ...enrollment,
+                        athlete: createdAthlete,
+                        discipline: selectedDiscipline,
+                        discipline_id: selectedDiscipline.id,
+                        status: paidOnboarding ? 'active' : 'pending',
+                        start_date: start,
+                        billing_frequency: data.billing_frequency,
+                        monthly_amount: Number(data.monthly_amount),
+                        due_day: Number(data.due_day),
+                    };
+                    const enrollmentsPage = props['enrollments.index'];
+                    enrollmentsPage.enrollments = pageList([...enrollmentsPage.enrollments.data, createdEnrollment]);
+                    const billingPage = props['memberships.index'];
+                    billingPage.charges = pageList([...billingPage.charges.data, {
+                        ...charge,
+                        enrollment: createdEnrollment,
+                        period: start,
+                        period_end: data.billing_frequency === 'biweekly' ? '2026-12-02' : '2026-12-17',
+                        due_date: start,
+                        amount: createdEnrollment.monthly_amount,
+                        status: paidOnboarding ? 'paid' : 'pending',
+                    }]);
+                    if (paidOnboarding && scenarioId === 'primeros-pasos-club') {
+                        const dashboard = props.dashboard;
+                        dashboard.stats.activeAthletes = 1;
+                        dashboard.stats.monthlyEnrollments = 1;
+                        dashboard.stats.monthlyRevenue = createdEnrollment.monthly_amount;
+                        dashboard.financialActivity.months[10].paid = createdEnrollment.monthly_amount;
+                        dashboard.recentPayments = [{ id: charge.id, name: createdAthlete.name, amount: createdEnrollment.monthly_amount, date }];
+                    }
+                }
+                success = paidOnboarding
+                    ? 'Deportista registrado, pago confirmado e inscripción activada.'
+                    : selectedDiscipline ? 'Deportista registrado. El primer cargo quedó pendiente en Recaudos.' : 'Deportista registrado correctamente.';
                 break;
+            }
             case 'enrollments.store':
                 page.enrollments = pageList([{ ...enrollment, ...data, status: 'pending' }]);
                 success = 'Inscripción creada como pendiente de activación.';

@@ -55,3 +55,15 @@ Implementar historial de medidas, tests físicos, mesociclos, macrociclos, entre
 
 - Política de cobro de inscripción a mitad de mes: completo, proporcional o siguiente período.
 - Estrategia de asignación de roles de Spatie por club (Teams) y flujo UX para cambiar de club.
+
+### Alta guiada y primer recaudo
+
+El administrador puede registrar el pago inicial desde Deportistas o dejar el cargo pendiente en Recaudos. Al confirmar el primer pago de una inscripción pendiente, el inicio efectivo y el primer periodo coinciden con la fecha del pago. También puede guardar el perfil y crear la inscripción más adelante.
+
+### Actualización de fotos de deportistas
+
+El listado muestra la nueva foto al guardar y usa las iniciales si el archivo ya no está disponible. Un fallo al subir el reemplazo conserva la foto anterior y deja un error en el campo.
+
+### Primeros pasos y actividad financiera
+
+El modal de Primeros pasos presenta configuración, disciplina y alta del deportista con el primer pago. El video completo verifica el resultado en Inscripciones, Recaudos y Resumen. El Resumen ofrece un gráfico animado de recaudos y cartera abierta por mes, una tabla de importes y el historial reciente con fecha e importe del pago. Los paneles usan datos del club activo.

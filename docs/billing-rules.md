@@ -8,7 +8,7 @@ Este documento fija las decisiones que deberán respetar las entregas de inscrip
 - La generación de cargos debe ser idempotente y estar protegida por una restricción única.
 - `billing:generate-monthly-charges` crea un cargo por inscripción y período mediante la restricción única `enrollment_id + period`.
 - Al activar una inscripción con fecha de inicio vigente, `EnrollmentController` crea inmediatamente el cargo del mes actual; la generación diaria cubre los periodos posteriores.
-- El primer pago de una inscripción pendiente fija el inicio del período en la fecha real de registro/aprobación del pago. El siguiente cobro se calcula desde esa fecha según `monthly`, `biweekly`, `quarterly`, `semiannual` o `annual`; no se muestra nuevamente la fecha del cargo inicial pagado.
+- El primer pago de una inscripción pendiente fija la fecha de inicio de la inscripción y del período en la fecha real de registro o aprobación del pago. El alta guiada permite registrar ese pago al guardar o dejar el primer cargo pendiente en Recaudos. El siguiente cobro se calcula desde esa fecha según `monthly`, `biweekly`, `quarterly`, `semiannual` o `annual`; no se muestra nuevamente la fecha del cargo inicial pagado.
 - Un cargo vencido no pagado marca la inscripción como `suspended`; registrar el pago puede reactivarla.
 - `billing:generate-monthly-charges` calcula `due_date` con `enrollments.due_day`, limitado al último día del mes. Los cargos existentes conservan su fecha histórica.
 - Los pagos parciales se distribuyen mediante asignaciones y nunca pueden superar el saldo disponible.
@@ -22,7 +22,7 @@ Este documento fija las decisiones que deberán respetar las entregas de inscrip
 
 La inscripción conserva `start_date` y no exige fecha final. `end_date` solo se establece al cancelar. El día de vencimiento se inicializa con el día de `start_date`, puede editarse entre 1 y 31, y se ajusta al último día disponible en meses cortos. El scheduler está registrado diariamente a las 00:10 en `routes/console.php`.
 
-La activación no depende del scheduler para mostrar el primer cargo. Para una inscripción con fecha de inicio futura no se crea el cargo hasta que la fecha sea vigente.
+La activación no depende del scheduler para mostrar el primer cargo. Para una inscripción activada desde Inscripciones con fecha de inicio futura, el corte crea el cargo cuando la fecha sea vigente. El alta guiada puede crear un cargo pendiente de forma anticipada. Su fecha inicial es la fecha prevista de inicio.
 
 Recaudos muestra el inicio y el fin del período cubierto por cada cargo. El generador toma el día siguiente al fin del último período como inicio del próximo. Editar el inicio, la periodicidad o el día de vencimiento de la inscripción conserva los períodos y las fechas de los cargos existentes.
 
@@ -31,7 +31,7 @@ Recaudos muestra el inicio y el fin del período cubierto por cada cargo. El gen
 | Fecha o estado | Efecto en un cobro recurrente |
 | --- | --- |
 | Fecha de inicio de la inscripción | La inscripción es elegible para el corte desde esa fecha. Si todavía carece de cargos, el generador toma esa fecha como inicio del primer período. |
-| Fecha del primer pago de una inscripción pendiente | El registro o la aprobación del pago fija el inicio y la vigencia del primer período pagado. Los pagos posteriores conservan el período de su cargo. |
+| Fecha del primer pago de una inscripción pendiente | La fecha de registro o aprobación fija el inicio efectivo de la inscripción y del primer período pagado. Los pagos posteriores conservan el período de su cargo. |
 | Fin del último período | El siguiente período comienza al día siguiente. El corte crea el cargo cuando llega esa fecha y la inscripción está activa. |
 | Día de vencimiento configurado | El generador lo aplica en el mes de inicio del nuevo período, con ajuste al último día del mes cuando corresponda. Los avisos consultan la fecha guardada en **Vence** en Recaudos. |
 | Inscripción suspendida | El corte diario la omite. El aviso de suspensión puede salir cuando hayan pasado cinco días calendario desde que quedó suspendida. |

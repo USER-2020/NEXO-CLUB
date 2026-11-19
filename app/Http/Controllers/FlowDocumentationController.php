@@ -56,14 +56,15 @@ class FlowDocumentationController extends Controller
 
         return array_map(function (array $chapter) use ($guides): array {
             $id = $chapter['id'];
-            $animation = "flow-videos/{$id}.gif";
-            $poster = "flow-videos/{$id}.jpg";
 
             return [
-                ...$chapter,
+                'id' => $id,
+                'label' => $chapter['label'],
+                'summary' => $chapter['summary'],
+                'href' => route($chapter['route'], absolute: false),
+                'action' => $chapter['action'],
                 'steps' => $guides->get($id)['steps'],
-                'animation' => is_file(public_path($animation)) ? asset($animation).'?v='.filemtime(public_path($animation)) : null,
-                'poster' => is_file(public_path($poster)) ? asset($poster) : null,
+                'video' => self::video($id),
             ];
         }, $chapters);
     }

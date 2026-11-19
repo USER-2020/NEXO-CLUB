@@ -50,7 +50,7 @@ El generador imprime cuántos cargos creó y cuántas inscripciones suspendió. 
 
 ## Guías y videos
 
-Abre **Flujos** (`/documentacion-flujos`) con una sesión autenticada y usa los filtros por módulo o rol. Las guías exclusivas de Superadmin están en **Plataforma → Documentación** (`/platform/documentacion-flujos`), con videos servidos por una ruta protegida. El catálogo contiene el [recorrido general](public/flow-videos/nexo-flujos.mp4) y las 16 guías siguientes.
+Abre **Flujos** (`/documentacion-flujos`) con una sesión autenticada y usa los filtros por módulo o rol. Las guías exclusivas de Superadmin están en **Plataforma → Documentación** (`/platform/documentacion-flujos`), con videos servidos por una ruta protegida. El catálogo contiene el [recorrido general](public/flow-videos/nexo-flujos.mp4) y las 17 guías siguientes.
 
 | Guía | Roles | Video |
 | --- | --- | --- |
@@ -60,7 +60,8 @@ Abre **Flujos** (`/documentacion-flujos`) con una sesión autenticada y usa los 
 | Administrar clubes desde Plataforma | Superadmin | En Plataforma |
 | Configurar el club y sus medios de pago | Admin, Contador, Usuario | [Configuración](public/flow-videos/club-configuracion.mp4) |
 | Crear y administrar disciplinas | Admin, Contador, Usuario | [Disciplinas](public/flow-videos/disciplinas.mp4) |
-| Registrar un deportista | Admin | [Deportistas](public/flow-videos/deportistas-perfil.mp4) |
+| Primeros pasos del club | Admin | [Del club al primer pago](public/flow-videos/primeros-pasos-club.mp4) |
+| Registrar un deportista y activar su inscripción con el primer pago | Admin | [Deportistas](public/flow-videos/deportistas-perfil.mp4) |
 | Crear y gestionar inscripciones | Admin | [Inscripciones](public/flow-videos/inscripciones.mp4) |
 | Registrar pagos y revisar comprobantes | Admin, Contador | [Recaudos](public/flow-videos/mensualidades-cobros.mp4) |
 | Administrar el equipo del club | Admin | [Equipo](public/flow-videos/equipo-permisos.mp4) |
@@ -103,9 +104,13 @@ Los GIF muestran los recorridos de Hyperframes con datos de demostración. La ta
 <details>
 <summary>Deportistas, inscripciones y recaudos</summary>
 
+**Primeros pasos del club**
+
+![Configuración, disciplina y alta con pago hasta verificar el recaudo en el Resumen](docs/media/readme/primeros-pasos-club.gif)
+
 **Alta del deportista**
 
-![Registro del perfil, contacto y condiciones de la inscripción](docs/media/readme/deportistas-perfil.gif)
+![Alta, primer pago y activación de la inscripción del deportista](docs/media/readme/deportistas-perfil.gif)
 
 **Inscripciones**
 
@@ -159,7 +164,11 @@ Los GIF muestran los recorridos de Hyperframes con datos de demostración. La ta
 
 </details>
 
-La **Visita guiada** abre pasos contextuales la primera vez que un usuario visita un módulo con recorrido y permite repetirlos desde el botón flotante. El Resumen del administrador también ofrece **Primeros pasos**, con capítulos de configuración, disciplinas, deportistas, inscripciones y recaudos.
+La **Visita guiada** abre pasos contextuales la primera vez que un usuario visita un módulo con recorrido y permite repetirlos desde el botón flotante. El Resumen del administrador también ofrece **Primeros pasos**. El modal se abre en el primer Resumen de cada inicio de sesión y se puede volver a abrir desde su botón. Los tres capítulos cubren configurar el club, crear una disciplina y registrar al primer deportista con su primer pago.
+
+En **Deportistas → Crear deportista → Inscripción y acceso**, elige la disciplina y **Registrar pago recibido ahora**. Selecciona el medio y pulsa **Registrar pago y activar**. La fecha de inicio de la inscripción y del primer periodo coincide con la fecha de registro del pago. Verifica **Activa** en **Inscripciones** y **Pagada** en **Recaudos → Pagados**. Si el pago falta, usa **Crear con cargo pendiente** y confírmalo después en Recaudos. Usa **Solo perfil** si vas a asociar la disciplina más adelante.
+
+La **Actividad financiera** del Resumen grafica los pagos por fecha de registro y la cartera abierta por mes de vencimiento del club activo durante el año actual. **Ver datos por mes** abre los totales exactos en COP. **Últimos pagos** muestra el importe y la fecha de cada registro.
 
 Para regenerar las composiciones, los MP4 y sus portadas, instala FFmpeg y FFprobe y ejecuta `npm run videos:render`. Hyperframes usa Chrome para capturar las composiciones HTML. Luego ejecuta `bash scripts/render-readme-gifs.sh` para actualizar los GIF de este README desde los videos nuevos. Consulta el [catálogo audiovisual y sus fuentes](docs/flow-videos.md).
 

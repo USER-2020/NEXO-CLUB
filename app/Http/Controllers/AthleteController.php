@@ -8,15 +8,18 @@ use App\Models\Athlete;
 use App\Models\Club;
 use App\Models\User;
 use App\Services\BillingPeriodService;
+use App\Services\ChargePaymentService;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 use Spatie\Permission\Models\Role;
@@ -34,19 +37,21 @@ class AthleteController extends Controller
 
         return Inertia::render('Athletes/Index', [
             'athletes' => $query->with(['enrollments.discipline'])->withCount(['enrollments as active_enrollments_count' => fn ($query) => $query->where('status', 'active')])->orderBy('last_name')->orderBy('first_name')->paginate($this->pageSize($request))->withQueryString()->through(fn (Athlete $athlete) => [
-                ...$athlete->toArray(),
-                'has_photo' => filled($athlete->photo_path),
+                ...$athlete->makeHidden('photo_path')->toArray(),
+                'photo_url' => $athlete->photoUrl(),
                 'current_enrollment' => $athlete->enrollments->sortByDesc('created_at')->first()?->only(['id', 'discipline_id', 'start_date', 'billing_frequency', 'monthly_amount', 'due_day', 'status']),
             ]),
             'disciplines' => $club->disciplines()->where('is_active', true)->orderBy('name')->get(['id', 'name']),
+            'today' => today()->toDateString(),
             'athleteAccess' => session('athleteAccess'),
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, ChargePaymentService $payments): RedirectResponse
     {
         $club = $this->club($request);
         $this->authorizeManager($request);
+        $payNow = $request->input('initial_charge_mode') === 'paid';
         $data = $request->validate([
             'first_name' => ['required', 'string', 'max:80'],
             'last_name' => ['required', 'string', 'max:80'],
@@ -62,12 +67,21 @@ class AthleteController extends Controller
             'guardian_name' => ['nullable', 'string', 'max:120'],
             'guardian_phone' => ['nullable', 'string', 'max:40'],
             'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-            'discipline_id' => ['nullable', 'integer', Rule::exists('disciplines', 'id')->where(fn ($query) => $query->where('club_id', $club->id)->where('is_active', true))],
-            'start_date' => ['nullable', 'date'],
+            'discipline_id' => [Rule::requiredIf($payNow), 'nullable', 'integer', Rule::exists('disciplines', 'id')->where(fn ($query) => $query->where('club_id', $club->id)->where('is_active', true))],
+            'start_date' => ['exclude_if:initial_charge_mode,paid', 'nullable', 'date'],
             'billing_frequency' => ['nullable', Rule::in(BillingPeriodService::FREQUENCIES)],
             'monthly_amount' => ['nullable', 'integer', 'min:0'],
             'due_day' => ['nullable', 'integer', 'min:1', 'max:31'],
+            'initial_charge_mode' => ['sometimes', Rule::in(['pending', 'paid'])],
+            'payment_method' => ['exclude_unless:initial_charge_mode,paid', 'required', Rule::in(ChargePaymentService::METHODS)],
+            'payment_reference' => ['exclude_unless:initial_charge_mode,paid', 'nullable', 'string', 'max:100'],
+        ], [
+            'discipline_id.required' => 'Selecciona una disciplina para registrar el pago.',
+            'payment_method.required' => 'Selecciona cómo recibiste el pago.',
         ]);
+        if ($payNow) {
+            $data['start_date'] = today()->toDateString();
+        }
         if (filled($data['discipline_id'] ?? null)) {
             validator($data, [
                 'start_date' => ['required', 'date'],
@@ -80,7 +94,9 @@ class AthleteController extends Controller
         unset($data['photo']);
         $enrollmentData = array_intersect_key($data, array_flip(['discipline_id', 'start_date', 'billing_frequency', 'monthly_amount', 'due_day']));
         $hasEnrollment = filled($enrollmentData['discipline_id'] ?? null);
-        unset($data['discipline_id'], $data['start_date'], $data['billing_frequency'], $data['monthly_amount'], $data['due_day']);
+        $paymentMethod = $data['payment_method'] ?? null;
+        $paymentReference = $data['payment_reference'] ?? null;
+        $data = array_diff_key($data, $enrollmentData, array_flip(['initial_charge_mode', 'payment_method', 'payment_reference']));
         $existingUser = filled($data['email'] ?? null) ? User::where('email', $data['email'])->first() : null;
         if ($existingUser) {
             return back()->withErrors(['email' => 'Este correo ya tiene una cuenta. Usa otro correo o solicita una vinculación manual.'])->withInput();
@@ -88,7 +104,7 @@ class AthleteController extends Controller
 
         $temporaryPassword = filled($data['email'] ?? null) ? Str::password(12) : null;
 
-        $athlete = DB::transaction(function () use ($club, $data, $photo, $temporaryPassword, $enrollmentData, $hasEnrollment) {
+        $athlete = DB::transaction(function () use ($club, $data, $photo, $temporaryPassword, $enrollmentData, $hasEnrollment, $payments, $paymentMethod, $paymentReference) {
             $user = null;
             if ($temporaryPassword) {
                 $user = User::create([
@@ -112,10 +128,6 @@ class AthleteController extends Controller
                 'user_id' => $user?->id,
                 'status' => 'active',
             ]);
-            if ($photo) {
-                $athlete->update(['photo_path' => $photo->store("athletes/{$club->id}", 'local')]);
-            }
-
             if ($hasEnrollment) {
                 $startDate = Carbon::parse($enrollmentData['start_date']);
                 $enrollment = $athlete->enrollments()->create([
@@ -124,7 +136,7 @@ class AthleteController extends Controller
                     'status' => 'pending',
                 ]);
                 $periodEnd = app(BillingPeriodService::class)->end($startDate, $enrollment->billing_frequency);
-                $enrollment->charges()->create([
+                $charge = $enrollment->charges()->create([
                     'club_id' => $club->id,
                     'period' => $startDate->toDateString(),
                     'period_end' => $periodEnd->toDateString(),
@@ -132,12 +144,24 @@ class AthleteController extends Controller
                     'amount' => $enrollment->monthly_amount,
                     'status' => 'pending',
                 ]);
+
+                if ($paymentMethod !== null) {
+                    $payments->register($charge, $paymentMethod, $paymentReference);
+                }
+            }
+
+            if ($photo) {
+                $athlete->update(['photo_path' => $this->storePhoto($photo, $club)]);
             }
 
             return $athlete->load('club');
         });
 
-        $response = back()->with('success', 'Deportista registrado correctamente.');
+        $response = back()->with('success', match (true) {
+            $payNow => 'Deportista registrado, pago confirmado e inscripción activada.',
+            $hasEnrollment => 'Deportista registrado. El primer cargo quedó pendiente en Recaudos.',
+            default => 'Deportista registrado correctamente.',
+        });
         if ($temporaryPassword) {
             $response->with('athleteAccess', [
                 'name' => trim($data['first_name'].' '.$data['last_name']),
@@ -200,7 +224,28 @@ class AthleteController extends Controller
         unset($data['photo']);
         $enrollmentData = array_intersect_key($data, array_flip(['discipline_id', 'start_date', 'billing_frequency', 'monthly_amount', 'due_day']));
         unset($data['discipline_id'], $data['start_date'], $data['billing_frequency'], $data['monthly_amount'], $data['due_day']);
-        $athlete->update($data);
+        if ($photo) {
+            $newPhoto = $this->storePhoto($photo, $club);
+            try {
+                $oldPhoto = DB::transaction(function () use ($athlete, $club, $data, $newPhoto): ?string {
+                    $current = $club->athletes()->lockForUpdate()->findOrFail($athlete->id);
+                    $oldPhoto = $current->photo_path;
+                    $current->update([...$data, 'photo_path' => $newPhoto]);
+
+                    return $oldPhoto;
+                });
+            } catch (\Throwable $exception) {
+                Storage::disk('local')->delete($newPhoto);
+
+                throw $exception;
+            }
+            if ($oldPhoto) {
+                Storage::disk('local')->delete($oldPhoto);
+            }
+            $athlete->refresh();
+        } else {
+            $athlete->update($data);
+        }
 
         $temporaryPassword = null;
         $accessCreated = false;
@@ -230,14 +275,6 @@ class AthleteController extends Controller
             $user->syncRoles([$role]);
             if ($athlete->user_id !== $user->id) {
                 $athlete->update(['user_id' => $user->id]);
-            }
-        }
-
-        if ($photo) {
-            $oldPhoto = $athlete->photo_path;
-            $athlete->update(['photo_path' => $photo->store("athletes/{$club->id}", 'local')]);
-            if ($oldPhoto) {
-                Storage::disk('local')->delete($oldPhoto);
             }
         }
 
@@ -290,9 +327,11 @@ class AthleteController extends Controller
     {
         $club = $this->club($request);
         abort_unless($athlete->club_id === $club->id, 404);
-        abort_unless($athlete->photo_path && Storage::disk('local')->exists($athlete->photo_path), 404);
+        abort_unless($athlete->user_id === $request->user()->id || $request->user()->hasRole('admin'), 404);
+        $path = $athlete->availablePhotoPath();
+        abort_unless($path, 404);
 
-        return response()->file(Storage::disk('local')->path($athlete->photo_path));
+        return response()->file(Storage::disk('local')->path($path), ['Cache-Control' => 'no-store'])->setPrivate();
     }
 
     public function status(Request $request, Athlete $athlete): RedirectResponse
@@ -307,6 +346,16 @@ class AthleteController extends Controller
         return back()->with('success', $status === 'active'
             ? 'Deportista activado correctamente.'
             : 'Deportista desactivado correctamente.');
+    }
+
+    private function storePhoto(UploadedFile $photo, Club $club): string
+    {
+        $path = $photo->store("athletes/{$club->id}", 'local');
+        if ($path === false) {
+            throw ValidationException::withMessages(['photo' => 'No pudimos guardar la foto. Vuelve a intentarlo.']);
+        }
+
+        return $path;
     }
 
     private function club(Request $request): Club

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 class Athlete extends Model
 {
@@ -25,6 +26,23 @@ class Athlete extends Model
             'weight_kg' => 'decimal:2',
             'access_email_sent_at' => 'datetime',
         ];
+    }
+
+    public function availablePhotoPath(): ?string
+    {
+        return filled($this->photo_path) && Storage::disk('local')->fileExists($this->photo_path)
+            ? $this->photo_path
+            : null;
+    }
+
+    public function photoUrl(): ?string
+    {
+        $path = $this->availablePhotoPath();
+
+        return $path ? route('athletes.photo', [
+            'athlete' => $this->id,
+            'v' => hash('sha256', $path),
+        ], absolute: false) : null;
     }
 
     public function club(): BelongsTo

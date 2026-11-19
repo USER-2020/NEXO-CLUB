@@ -6,10 +6,8 @@ use App\Mail\AthleteSubscriptionActivatedMail;
 use App\Models\Club;
 use App\Models\Enrollment;
 use App\Models\MonthlyCharge;
-use App\Models\Payment;
 use App\Models\PaymentSubmission;
-use App\Services\BillingPeriodService;
-use Carbon\Carbon;
+use App\Services\ChargePaymentService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -55,33 +53,22 @@ class BillingController extends Controller
         ]);
     }
 
-    public function approveSubmission(Request $request, PaymentSubmission $submission): RedirectResponse
+    public function approveSubmission(Request $request, PaymentSubmission $submission, ChargePaymentService $payments): RedirectResponse
     {
         $club = $this->club($request);
         $this->authorizeBilling($request);
         abort_unless($submission->club_id === $club->id, 404);
         abort_if($submission->status !== 'pending', 422, 'Este comprobante ya fue revisado.');
 
-        $activatedEnrollment = null;
-        DB::transaction(function () use ($submission, $request, $club, &$activatedEnrollment): void {
-            $charge = $submission->monthlyCharge()->lockForUpdate()->firstOrFail();
-            abort_if($charge->status === 'paid', 422, 'La mensualidad ya está pagada.');
-            $paidAt = now();
-            $this->anchorFirstPaymentPeriod($charge, $paidAt);
-            Payment::create([
-                'club_id' => $club->id,
-                'monthly_charge_id' => $charge->id,
-                'amount' => $charge->amount,
-                'paid_at' => $paidAt,
-                'method' => in_array($submission->method, ['nequi', 'bre_b', 'payment_key', 'bank_account'], true) ? 'transfer' : $submission->method,
-                'reference' => $submission->reference,
-            ]);
-            $charge->update(['status' => 'paid', 'paid_at' => $paidAt]);
-            if (in_array($charge->enrollment->status, ['pending', 'suspended'], true)) {
-                $charge->enrollment->update(['status' => 'active', 'suspended_at' => null, 'suspension_reason' => null, 'suspension_notified_at' => null]);
-                $activatedEnrollment = $charge->enrollment->fresh(['athlete', 'club', 'discipline', 'charges']);
-            }
+        $activatedEnrollment = DB::transaction(function () use ($submission, $request, $club, $payments): ?Enrollment {
+            $submission = PaymentSubmission::query()->where('club_id', $club->id)->lockForUpdate()->findOrFail($submission->id);
+            abort_if($submission->status !== 'pending', 422, 'Este comprobante ya fue revisado.');
+            $charge = $submission->monthlyCharge()->where('club_id', $club->id)->firstOrFail();
+            $method = in_array($submission->method, ['nequi', 'bre_b', 'payment_key', 'bank_account'], true) ? 'transfer' : $submission->method;
+            $activated = $payments->register($charge, $method, $submission->reference);
             $submission->update(['status' => 'approved', 'reviewed_by' => $request->user()->id, 'reviewed_at' => now()]);
+
+            return $activated ? $charge->enrollment()->with(['athlete', 'club', 'discipline', 'charges'])->first() : null;
         });
 
         $this->sendActivationEmail($activatedEnrollment);
@@ -96,7 +83,11 @@ class BillingController extends Controller
         abort_unless($submission->club_id === $club->id, 404);
         abort_if($submission->status !== 'pending', 422, 'Este comprobante ya fue revisado.');
         $data = $request->validate(['rejection_reason' => ['required', 'string', 'max:500']]);
-        $submission->update(['status' => 'rejected', 'rejection_reason' => $data['rejection_reason'], 'reviewed_by' => $request->user()->id, 'reviewed_at' => now()]);
+        DB::transaction(function () use ($submission, $request, $club, $data): void {
+            $submission = PaymentSubmission::query()->where('club_id', $club->id)->lockForUpdate()->findOrFail($submission->id);
+            abort_if($submission->status !== 'pending', 422, 'Este comprobante ya fue revisado.');
+            $submission->update(['status' => 'rejected', 'rejection_reason' => $data['rejection_reason'], 'reviewed_by' => $request->user()->id, 'reviewed_at' => now()]);
+        });
 
         return back()->with('success', 'Comprobante rechazado. El deportista podrá enviar uno nuevo.');
     }
@@ -110,24 +101,16 @@ class BillingController extends Controller
         return Storage::disk('local')->download($submission->receipt_path);
     }
 
-    public function pay(Request $request, MonthlyCharge $charge): RedirectResponse
+    public function pay(Request $request, MonthlyCharge $charge, ChargePaymentService $payments): RedirectResponse
     {
         $club = $this->club($request);
         $this->authorizeBilling($request);
         abort_unless($charge->club_id === $club->id, 404);
         abort_if($charge->status === 'paid', 422, 'Esta mensualidad ya está pagada.');
-        $data = $request->validate(['method' => ['required', Rule::in(['cash', 'transfer', 'card'])], 'reference' => ['nullable', 'string', 'max:100']]);
+        $data = $request->validate(['method' => ['required', Rule::in(ChargePaymentService::METHODS)], 'reference' => ['nullable', 'string', 'max:100']]);
+        $activated = $payments->register($charge, $data['method'], $data['reference'] ?? null);
 
-        $wasRestricted = in_array($charge->enrollment->status, ['pending', 'suspended'], true);
-        $paidAt = now();
-        $this->anchorFirstPaymentPeriod($charge, $paidAt);
-        Payment::create(['club_id' => $club->id, 'monthly_charge_id' => $charge->id, 'amount' => $charge->amount, 'paid_at' => $paidAt, ...$data]);
-        $charge->update(['status' => 'paid', 'paid_at' => $paidAt]);
-        if ($wasRestricted) {
-            $charge->enrollment->update(['status' => 'active', 'suspended_at' => null, 'suspension_reason' => null, 'suspension_notified_at' => null]);
-        }
-
-        $this->sendActivationEmail($wasRestricted ? $charge->enrollment->fresh(['athlete', 'club', 'discipline', 'charges']) : null);
+        $this->sendActivationEmail($activated ? $charge->enrollment()->with(['athlete', 'club', 'discipline', 'charges'])->first() : null);
 
         return back()->with('success', 'Pago registrado. La inscripción fue reactivada si estaba suspendida.');
     }
@@ -147,25 +130,6 @@ class BillingController extends Controller
                 'error' => $exception->getMessage(),
             ]);
         }
-    }
-
-    private function anchorFirstPaymentPeriod(MonthlyCharge $charge, Carbon $paidAt): void
-    {
-        $enrollment = $charge->enrollment;
-
-        // The first payment activates the enrollment. From that point, the
-        // next charge must be calculated from the real activation/payment date,
-        // not from the date on which the pending enrollment was pre-created.
-        if ($enrollment->status !== 'pending' || $charge->payment()->exists()) {
-            return;
-        }
-
-        $period = $paidAt->copy()->startOfDay();
-        $charge->update([
-            'period' => $period->toDateString(),
-            'period_end' => app(BillingPeriodService::class)->end($period, $enrollment->billing_frequency ?? 'monthly')->toDateString(),
-            'due_date' => $period->toDateString(),
-        ]);
     }
 
     private function club(Request $request): Club

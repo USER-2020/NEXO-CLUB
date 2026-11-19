@@ -30,6 +30,8 @@ const tours: Record<string, { key: string; title: string; description: string }>
 const flowSteps: Record<string, TourStep[]> = {
     Dashboard: [
         { target: 'dashboard-kpis', title: 'Indicadores del club', description: 'Consulta aquí los deportistas, inscripciones y cobros que requieren atención.' },
+        { target: 'dashboard-finances', title: 'Actividad financiera', description: 'Consulta los pagos por mes y la cartera abierta por vencimiento del club activo. Abre Ver datos por mes para ver los importes exactos.' },
+        { target: 'dashboard-onboarding', title: 'Primeros pasos', description: 'Abre los capítulos de configuración, disciplina y registro del primer deportista con su pago.' },
         { target: 'dashboard-action', title: 'Siguiente acción', description: 'Usa esta acción para completar la configuración inicial del club.' },
     ],
     'Platform/Dashboard': [
@@ -50,9 +52,9 @@ const flowSteps: Record<string, TourStep[]> = {
         { target: 'audit-history', title: 'Historial auditable', description: 'Consulta accesos y operaciones con actor, club, fecha y detalle del cambio.' },
     ],
     'Athletes/Index': [
-        { target: 'athletes-create', title: 'Crear deportista', description: 'Inicia el registro del perfil permanente del deportista y, si corresponde, su inscripción.' },
-        { target: 'athletes-list', title: 'Perfiles del club', description: 'Consulta perfiles, estado, disciplina y acceso de cada deportista.' },
-        { target: 'athletes-form', title: 'Formulario guiado', description: 'El modal organiza los datos personales, contacto, información física e inscripción.' },
+        { target: 'athletes-create', title: 'Crear deportista', description: 'En el último paso del alta, elige la disciplina y registra el pago recibido para activar la inscripción ese día. También puedes dejar el cargo pendiente o guardar solo el perfil.' },
+        { target: 'athletes-list', title: 'Perfiles del club', description: 'Consulta el perfil y sus inscripciones activas. Si guardaste solo el perfil, puedes inscribirlo más adelante desde Inscripciones.' },
+        { target: 'athletes-form', title: 'Formulario guiado', description: 'En Inscripción y acceso, elige el medio del pago recibido y pulsa Registrar pago y activar. Si dejas el cargo pendiente, la confirmación en Recaudos fijará la fecha de inicio.' },
     ],
     'Enrollments/Index': [
         { target: 'enrollments-create', title: 'Crear inscripción', description: 'Asocia un deportista con una disciplina y configura sus condiciones de cobro.' },
@@ -60,7 +62,7 @@ const flowSteps: Record<string, TourStep[]> = {
         { target: 'enrollment-billing', title: 'Periodicidad y valor', description: 'Define la fecha de inicio, periodicidad, valor del período y día de vencimiento.' },
     ],
     'Memberships/Index': [
-        { target: 'billing-charges', title: 'Cargos del club', description: 'Consulta los cobros pendientes, vencidos y pagados de las inscripciones activas.' },
+        { target: 'billing-charges', title: 'Cargos del club', description: 'Consulta los cobros pendientes, vencidos y pagados del club. Usa Pagados para comprobar el primer recaudo registrado desde Deportistas.' },
         { target: 'billing-payment', title: 'Registrar pago', description: 'Registra el pago recibido y reactiva una inscripción pendiente o suspendida cuando corresponda.' },
         { target: 'billing-submissions', title: 'Comprobantes', description: 'Revisa los comprobantes enviados por los deportistas y decide si aprobarlos o rechazarlos.' },
     ],

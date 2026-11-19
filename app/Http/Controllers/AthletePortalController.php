@@ -42,7 +42,7 @@ class AthletePortalController extends Controller
                 'name' => trim($athlete->first_name.' '.$athlete->last_name),
                 'email' => $request->user()->email,
                 'user_name' => $request->user()->name,
-                'avatar_url' => filled($athlete->photo_path) ? route('athletes.photo', $athlete->id) : null,
+                'avatar_url' => $athlete->photoUrl(),
                 'document' => $athlete->document_number,
                 'phone' => $athlete->phone,
                 'birth_date' => $athlete->birth_date?->format('Y-m-d'),

@@ -23,6 +23,7 @@ type FormData = {
 
 export default function Register() {
     const [step, setStep] = useState(1);
+    const [localErrors, setLocalErrors] = useState<Record<string, string>>({});
     const { data, setData, post, processing, errors, reset } = useForm<FormData>({
         name: '', email: '', password: '', password_confirmation: '',
         club_name: '', club_email: '', club_phone: '', club_address: '', club_city: '', club_timezone: 'America/Bogota',
@@ -30,11 +31,15 @@ export default function Register() {
 
     const submit: FormEventHandler = (event) => {
         event.preventDefault();
-        if (step < 5) {
-            setStep((current) => current + 1);
-            return;
-        }
-        post(route('register'), { onFinish: () => reset('password', 'password_confirmation') });
+        const nextErrors: Record<string, string> = {};
+        if (step === 1) { if (!data.name) nextErrors.name = 'Ingresa tu nombre completo.'; if (!data.email) nextErrors.email = 'Ingresa tu correo electrónico.'; }
+        if (step === 2) { if (!data.password) nextErrors.password = 'Define una contraseña.'; if (!data.password_confirmation) nextErrors.password_confirmation = 'Confirma la contraseña.'; if (data.password && data.password_confirmation && data.password !== data.password_confirmation) nextErrors.password_confirmation = 'Las contraseñas no coinciden.'; }
+        if (step === 3) { if (!data.club_name) nextErrors.club_name = 'Ingresa el nombre del club.'; if (!data.club_email) nextErrors.club_email = 'Ingresa el correo del club.'; }
+        if (step === 4) { if (!data.club_phone) nextErrors.club_phone = 'Ingresa el teléfono del club.'; if (!data.club_address) nextErrors.club_address = 'Ingresa la dirección.'; if (!data.club_city) nextErrors.club_city = 'Ingresa la ciudad.'; }
+        setLocalErrors(nextErrors);
+        if (Object.keys(nextErrors).length > 0) return;
+        if (step < 5) { setStep((current) => current + 1); return; }
+        post(route('register'), { onError: (responseErrors) => { const keys = Object.keys(responseErrors); if (keys.some((key) => ['name', 'email'].includes(key))) setStep(1); else if (keys.some((key) => ['password', 'password_confirmation'].includes(key))) setStep(2); else if (keys.some((key) => ['club_name', 'club_email'].includes(key))) setStep(3); else if (keys.some((key) => ['club_phone', 'club_address', 'club_city', 'club_timezone'].includes(key))) setStep(4); }, onFinish: () => reset('password', 'password_confirmation') });
     };
 
     const canContinue = () => {
@@ -60,28 +65,28 @@ export default function Register() {
         <form onSubmit={submit} className="space-y-5">
             {step === 1 && <section className="space-y-3">
                 <StepTitle eyebrow="Paso 1 de 5" title="Identifica tu acceso" description="Comencemos con los datos de la persona responsable." />
-                <Field id="name" label="Nombre completo" value={data.name} onChange={(value) => setData('name', value)} error={errors.name} required />
-                <Field id="email" label="Correo electrónico" type="email" value={data.email} onChange={(value) => setData('email', value)} error={errors.email} required />
+                <Field id="name" label="Nombre completo" value={data.name} onChange={(value) => setData('name', value)} error={errors.name || localErrors.name} required />
+                <Field id="email" label="Correo electrónico" type="email" value={data.email} onChange={(value) => setData('email', value)} error={errors.email || localErrors.email} required />
             </section>}
 
             {step === 2 && <section className="space-y-3">
                 <StepTitle eyebrow="Paso 2 de 5" title="Protege tu cuenta" description="Define la contraseña que usarás cuando tu club sea aprobado." />
-                <Field id="password" label="Contraseña" type="password" value={data.password} onChange={(value) => setData('password', value)} error={errors.password} required />
-                <Field id="password_confirmation" label="Confirmar contraseña" type="password" value={data.password_confirmation} onChange={(value) => setData('password_confirmation', value)} error={errors.password_confirmation} required />
+                <Field id="password" label="Contraseña" type="password" value={data.password} onChange={(value) => setData('password', value)} error={errors.password || localErrors.password} required />
+                <Field id="password_confirmation" label="Confirmar contraseña" type="password" value={data.password_confirmation} onChange={(value) => setData('password_confirmation', value)} error={errors.password_confirmation || localErrors.password_confirmation} required />
                 {data.password && data.password_confirmation && data.password !== data.password_confirmation && <p className="text-xs text-red-300">Las contraseñas no coinciden.</p>}
             </section>}
 
             {step === 3 && <section className="space-y-3">
                 <StepTitle eyebrow="Paso 3 de 5" title="Identifica tu club" description="Estos son los datos principales que revisará nuestro equipo." />
-                <Field id="club_name" label="Nombre del club" value={data.club_name} onChange={(value) => setData('club_name', value)} error={errors.club_name} required />
-                <Field id="club_email" label="Correo del club" type="email" value={data.club_email} onChange={(value) => setData('club_email', value)} error={errors.club_email} required />
+                <Field id="club_name" label="Nombre del club" value={data.club_name} onChange={(value) => setData('club_name', value)} error={errors.club_name || localErrors.club_name} required />
+                <Field id="club_email" label="Correo del club" type="email" value={data.club_email} onChange={(value) => setData('club_email', value)} error={errors.club_email || localErrors.club_email} required />
             </section>}
 
             {step === 4 && <section className="space-y-3">
                 <StepTitle eyebrow="Paso 4 de 5" title="Añade contacto y ubicación" description="Ayúdanos a identificar y contactar tu club." />
-                <PhoneInputField label="Teléfono del club" value={data.club_phone} onChange={(value) => setData('club_phone', value)} error={errors.club_phone} required />
-                <Field id="club_address" label="Dirección" value={data.club_address} onChange={(value) => setData('club_address', value)} error={errors.club_address} required />
-                <Field id="club_city" label="Ciudad" value={data.club_city} onChange={(value) => setData('club_city', value)} error={errors.club_city} required />
+                <PhoneInputField label="Teléfono del club" value={data.club_phone} onChange={(value) => setData('club_phone', value)} error={errors.club_phone || localErrors.club_phone} required />
+                <Field id="club_address" label="Dirección" value={data.club_address} onChange={(value) => setData('club_address', value)} error={errors.club_address || localErrors.club_address} required />
+                <Field id="club_city" label="Ciudad" value={data.club_city} onChange={(value) => setData('club_city', value)} error={errors.club_city || localErrors.club_city} required />
             </section>}
 
             {step === 5 && <section className="space-y-3">
@@ -95,7 +100,7 @@ export default function Register() {
 
             <div className="flex items-center justify-between gap-3 border-t border-slate-800 pt-3">
                 {step === 1 ? <Link href={route('login')} className="text-sm text-slate-400 underline transition hover:text-white">¿Ya tienes una cuenta?</Link> : <button type="button" onClick={() => setStep((current) => current - 1)} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-700 px-4 py-2.5 text-sm font-semibold text-slate-300 transition hover:bg-slate-800"><ArrowLeft size={16} /> Anterior</button>}
-                <PrimaryButton disabled={processing || !canContinue()}>{processing ? 'Enviando…' : step === 5 ? 'Enviar solicitud' : <>Continuar <ArrowRight size={16} /></>}</PrimaryButton>
+                <PrimaryButton disabled={processing}>{processing ? 'Enviando…' : step === 5 ? 'Enviar solicitud' : <>Continuar <ArrowRight size={16} /></>}</PrimaryButton>
             </div>
         </form>
     </GuestLayout>;

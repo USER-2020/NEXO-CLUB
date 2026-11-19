@@ -63,4 +63,17 @@ El catálogo `resources/hyperframes/flows/catalog.json` contiene los pasos, role
 
 `npm run videos:render` genera las composiciones, renderiza con Hyperframes y extrae una portada JPEG por video con FFmpeg. Los videos comunes se publican en `public/flow-videos/` cuando termina el conjunto. El recorrido general contiene únicamente guías compartidas. Laravel filtra el catálogo antes de enviarlo a Inertia y sirve los videos y portadas exclusivos desde `resources/hyperframes/platform-videos/` mediante una ruta protegida por el middleware de Superadmin. Las guías conservan sus instrucciones escritas si falta algún archivo.
 
-Al autenticar, Laravel activa una marca de sesión que el primer Resumen del administrador del club consume. El modal de primeros pasos usa los capítulos de `resources/hyperframes/flows/onboarding.json`. Cada capítulo muestra un GIF generado con FFmpeg a partir de su Hyperframe y conserva las instrucciones del catálogo. `bash scripts/render-onboarding-gifs.sh` vuelve a generar los GIFs a partir de los MP4 disponibles. Driver.js espera a que el modal se cierre antes de mostrar la visita al Resumen, si corresponde.
+Al autenticar, Laravel activa una marca de sesión que el primer Resumen del administrador del club consume. El modal de primeros pasos se puede reabrir desde el Resumen y usa tres capítulos de `resources/hyperframes/flows/onboarding.json`. Cada capítulo reproduce el MP4 del catálogo, muestra sus instrucciones y enlaza al módulo operativo. El recorrido completo también está disponible en Flujos. Driver.js espera a que el modal se cierre antes de mostrar la visita al Resumen, si corresponde.
+
+### Primer recaudo desde el alta del deportista
+
+El alta guiada puede guardar el perfil solo, crear una inscripción pendiente con su primer cargo o registrar un pago recibido y activar la inscripción. El backend registra el pago, actualiza el cargo y activa la inscripción en la misma transacción. Recaudos usa el mismo servicio al confirmar un pago o aprobar un comprobante. Para una inscripción pendiente, el primer pago confirmado fija la misma fecha para el inicio de la inscripción y del primer periodo en la zona horaria de la aplicación.
+
+### Fotos de deportistas
+
+Las fotos se guardan en el disco privado y se entregan sin caché mediante una ruta del club activo, disponible para el administrador del club y el usuario vinculado al perfil. La URL cambia con cada archivo nuevo. Al reemplazar una foto se conserva el archivo anterior hasta guardar su reemplazo y actualizar el perfil.
+
+
+### Actividad financiera del Resumen
+
+Laravel agrega montos en pesos por mes y por club activo. La serie de recaudos usa `payments.paid_at`. La cartera abierta agrupa los cargos pendientes o vencidos por `due_date` del año actual. El saldo pendiente del indicador incluye todos los años. Los gráficos respetan la preferencia de movimiento reducido y ofrecen los mismos importes en una tabla desplegable.

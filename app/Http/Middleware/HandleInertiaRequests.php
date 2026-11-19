@@ -69,7 +69,7 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $user ? [...$user->toArray(), 'role' => $user->roles->first()?->name, 'avatar_url' => $athlete?->photo_path ? route('athletes.photo', $athlete->id) : null] : null,
+                'user' => $user ? [...$user->toArray(), 'role' => $user->roles->first()?->name, 'avatar_url' => $activeClub && $athlete?->club_id === $activeClub->id ? $athlete->photoUrl() : null] : null,
             ],
             'clubContext' => [
                 'activeClub' => $activeClub?->only(['id', 'name', 'slug', 'currency', 'timezone']),

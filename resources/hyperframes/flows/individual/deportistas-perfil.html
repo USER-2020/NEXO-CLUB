@@ -3,12 +3,13 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>NEXO CLUB · Registrar un deportista</title>
+    <title>NEXO CLUB · Registrar un deportista y activar su inscripción con el primer pago</title>
     <link rel="stylesheet" href="../.preview/preview.css">
     <style>
         html, body { width: 1280px; height: 720px; margin: 0; overflow: hidden; }
         *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
         #app main { padding-bottom: 130px; }
+        #app [data-tour="athletes-form"] { bottom: 110px; } #app [data-tour="athletes-form"] > div { max-height: 580px; }
         #guide-footer { position: fixed; z-index: 400; display: grid; grid-template-columns: 280px 1fr; gap: 24px; align-items: center; inset: auto 18px 14px; min-height: 88px; padding: 12px 22px 14px; border-radius: 16px; border: 1px solid #425565; background: #0b1220; box-shadow: 0 8px 24px #03071099; }
         #guide-section { color: #b8f34b; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .12em; }
         #guide-title { color: #f8fafc; font-size: 19px; font-weight: 800; line-height: 1.2; margin-top: 4px; }
@@ -19,7 +20,7 @@
     </style>
 </head>
 <body>
-    <div data-composition-id="deportistas-perfil" data-width="1280" data-height="720" data-duration="65">
+    <div data-composition-id="deportistas-perfil" data-width="1280" data-height="720" data-duration="85">
         <div id="app"></div>
         <aside id="guide-footer">
             <div><p id="guide-section"></p><h1 id="guide-title"></h1></div>

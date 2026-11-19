@@ -16,6 +16,7 @@ use App\Http\Controllers\PlatformClubController;
 use App\Http\Controllers\PlatformDashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Models\Payment;
+use App\Services\ClubFinancialActivity;
 use App\Services\PlatformAccess;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
@@ -31,7 +32,7 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function (Request $request) {
+Route::get('/dashboard', function (Request $request, ClubFinancialActivity $financialActivity) {
     if (app(PlatformAccess::class)->isSuperadmin($request->user())) {
         return redirect()->route('platform.dashboard');
     }
@@ -41,26 +42,31 @@ Route::get('/dashboard', function (Request $request) {
     }
 
     $club = $request->attributes->get('activeClub');
-    $monthStart = now()->startOfMonth();
-    $monthEnd = now()->endOfMonth();
+    $today = now();
+    $monthStart = $today->copy()->startOfMonth();
+    $nextMonth = $monthStart->copy()->addMonth();
+    $activity = $financialActivity->forYear($club, $today);
 
-    $showOnboarding = $request->user()->roles()->where('name', 'admin')->exists() && $request->session()->pull('show_club_onboarding', false);
+    $canViewOnboarding = $request->user()->roles()->where('name', 'admin')->exists();
+
     return Inertia::render('Dashboard', [
-        'onboardingChapters' => $showOnboarding ? FlowDocumentationController::onboardingChapters() : [],
+        'onboardingChapters' => $canViewOnboarding ? FlowDocumentationController::onboardingChapters() : [],
+        'showOnboarding' => $canViewOnboarding && $request->session()->pull('show_club_onboarding', false),
         'stats' => [
             'activeAthletes' => $club->enrollments()->where('status', 'active')->distinct('athlete_id')->count('athlete_id'),
-            'monthlyEnrollments' => $club->enrollments()->whereBetween('created_at', [$monthStart, $monthEnd])->count(),
-            'monthlyRevenue' => Payment::where('club_id', $club->id)->whereBetween('paid_at', [$monthStart, $monthEnd])->sum('amount'),
+            'monthlyEnrollments' => $club->enrollments()->where('created_at', '>=', $monthStart)->where('created_at', '<', $nextMonth)->count(),
+            'monthlyRevenue' => $activity[$today->month - 1]['paid'],
             'outstandingBalance' => $club->monthlyCharges()->whereIn('status', ['pending', 'overdue'])->sum('amount'),
             'overdueCharges' => $club->monthlyCharges()->where('status', 'overdue')->count(),
         ],
-        'recentPayments' => Payment::with('monthlyCharge.enrollment.athlete')->where('club_id', $club->id)->latest('paid_at')->limit(5)->get()->map(fn (Payment $payment) => [
+        'financialActivity' => ['year' => $today->year, 'months' => $activity],
+        'recentPayments' => Payment::with('monthlyCharge.enrollment.athlete')->where('club_id', $club->id)->latest('paid_at')->orderByDesc('id')->limit(5)->get()->map(fn (Payment $payment) => [
             'id' => $payment->id,
             'name' => $payment->monthlyCharge?->enrollment?->athlete?->first_name.' '.$payment->monthlyCharge?->enrollment?->athlete?->last_name,
-            'amount' => $payment->amount,
+            'amount' => (int) $payment->amount,
             'date' => $payment->paid_at?->format('Y-m-d'),
         ])->values(),
-        'today' => now()->locale('es')->translatedFormat('l, d \\d\\e F \\d\\e Y'),
+        'today' => $today->locale('es')->translatedFormat('l, d \\d\\e F \\d\\e Y'),
     ]);
 })->middleware(['auth', 'verified', 'active.club'])->name('dashboard');
 

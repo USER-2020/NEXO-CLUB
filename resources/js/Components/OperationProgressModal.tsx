@@ -2,12 +2,16 @@ import { useEffect, useRef, useState } from 'react';
 import { router } from '@inertiajs/react';
 import { CheckCircle2, LoaderCircle } from 'lucide-react';
 
-export type Operation = 'athlete' | 'enrollment' | 'club' | 'club_application' | 'discipline' | 'member' | 'payment_method' | 'payment_submission';
+export type Operation = 'athlete' | 'athlete_with_payment' | 'enrollment' | 'club' | 'club_application' | 'discipline' | 'member' | 'payment_method' | 'payment_submission';
 
 const messages: Record<Operation, { create: string[]; update: string[] }> = {
     athlete: {
         create: ['Creando deportista', 'Asociando datos personales y físicos', 'Activando deportista'],
         update: ['Actualizando deportista', 'Guardando cambios del perfil', 'Sincronizando información'],
+    },
+    athlete_with_payment: {
+        create: ['Creando perfil e inscripción', 'Registrando el primer pago', 'Activando la inscripción'],
+        update: [],
     },
     enrollment: {
         create: ['Creando inscripción', 'Asociando deportista y disciplina', 'Registrando inscripción pendiente'],
@@ -101,7 +105,10 @@ export function GlobalOperationProgressModal() {
 
             const path = visit.url.pathname;
             const isReceipt = path.replace(/\/\d+\/comprobante$/, '/1/comprobante') === receiptPath;
-            const type = operations[path] ?? (isReceipt ? 'payment_submission' : null);
+            const chargeMode = visit.data instanceof FormData ? visit.data.get('initial_charge_mode') : visit.data.initial_charge_mode;
+            const type = operations[path] === 'athlete' && chargeMode === 'paid'
+                ? 'athlete_with_payment'
+                : operations[path] ?? (isReceipt ? 'payment_submission' : null);
             if (!type) return;
 
             startedAtRef.current = Date.now();

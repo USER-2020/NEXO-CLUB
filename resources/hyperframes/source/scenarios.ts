@@ -2,6 +2,15 @@ export type Action = [offset: number, kind: 'click' | 'type' | 'file' | 'view' |
 type Beat = [seconds: number, ...actions: Action[]];
 type Scenario = { page: string; beats: Beat[] };
 
+const athleteOnboarding: Beat[] = [
+    [11, [1, 'click', 'Crear deportista'], [3, 'type', 'Nombres', 'Lucía'], [5, 'type', 'Apellidos', 'Ríos'], [7, 'type', 'Número de documento', '1000000001'], [9, 'click', 'Continuar']],
+    [7, [1, 'type', 'Correo electrónico', 'lucia@example.test'], [3.5, 'type', 'Acudiente', 'María Ríos'], [5.5, 'click', 'Continuar']],
+    [6, [1, 'view', 'Foto y datos opcionales'], [4, 'click', 'Continuar']],
+    [15, [1, 'view', 'Guardar solo perfil'], [3, 'click', 'Disciplina'], [5, 'click', 'Natación'], [7, 'click', 'Periodicidad'], [9, 'click', 'Quincenal'], [11, 'type', 'Valor del periodo', '85000'], [13, 'view', 'Crear con cargo pendiente']],
+    [31, [1, 'click', 'Primer recaudo'], [3, 'click', 'Registrar pago recibido ahora'], [5, 'click', 'Medio del pago recibido'], [7, 'click', 'Efectivo'], [9, 'click', 'Registrar pago y activar'], [27, 'view', '1 inscripciones activas']],
+    [15, [1, 'click', 'Inscripciones'], [3, 'view', 'Activa'], [6, 'click', 'Recaudos'], [8, 'click', 'Filtrar recaudos'], [10, 'click', 'Pagados'], [12, 'view', 'Pagada']],
+];
+
 export const scenarios: Record<string, Scenario> = {
     'acceso-roles': { page: 'login', beats: [
         [8, [1, 'type', '#email', 'ana@example.test'], [3, 'type', '#password', 'clave-incorrecta'], [6, 'click', 'Iniciar sesión']],
@@ -17,7 +26,7 @@ export const scenarios: Record<string, Scenario> = {
     'resumen-club': { page: 'dashboard', beats: [
         [6, [1, 'view', 'Club Horizonte']],
         [8, [1, 'view', 'Deportistas activos'], [4, 'view', 'Recaudo del mes']],
-        [8, [1, 'view', 'Últimos pagos'], [5, 'view', 'Recaudos']],
+        [8, [1, 'view', 'Actividad financiera'], [4, 'view', 'Últimos pagos'], [6, 'view', 'Lucía Ríos']],
         [7, [1, 'click', 'Configurar club'], [3, 'view', 'Editar información del club']],
     ] },
     'clubes-global': { page: 'platform.dashboard', beats: [
@@ -38,16 +47,16 @@ export const scenarios: Record<string, Scenario> = {
         [22, [1, 'click', 'Crear disciplina'], [19, 'view', 'Natación']],
         [10, [1, 'click', 'Editar Natación'], [3, 'type', 'Descripción', 'Técnica y resistencia en piscina.'], [5, 'click', 'Guardar cambios'], [7, 'click', 'Desactivar Natación']],
     ] },
-    'deportistas-perfil': { page: 'athletes.index', beats: [
-        [12, [1, 'click', 'Crear deportista'], [3, 'type', 'Nombres', 'Lucía'], [5, 'type', 'Apellidos', 'Ríos'], [7, 'type', 'Número de documento', '1000000001'], [10, 'click', 'Continuar']],
-        [8, [1, 'type', 'Correo electrónico', 'lucia@example.test'], [4, 'type', 'Acudiente', 'María Ríos'], [6, 'click', 'Continuar']],
-        [8, [1, 'type', 'Estatura (cm)', '160'], [4, 'type', 'Peso (kg)', '53'], [6, 'click', 'Continuar']],
-        [13, [1, 'click', 'Disciplina'], [3, 'click', 'Natación'], [5, 'click', 'Periodicidad'], [7, 'click', 'Quincenal'], [9, 'type', 'Valor del periodo', '85000'], [11, 'type', 'Día de vencimiento', '18']],
-        [24, [1, 'click', 'Crear deportista y recaudo'], [19, 'view', 'Lucía Ríos']],
+    'primeros-pasos-club': { page: 'dashboard', beats: [
+        [10, [1, 'click', 'Configurar club'], [3, 'view', 'Club Horizonte'], [5, 'type', 'Ciudad', 'Medellín'], [8, 'click', 'Guardar cambios']],
+        [26, [1, 'click', 'Disciplinas'], [3, 'type', 'Nombre', 'Natación'], [5, 'click', 'Crear disciplina'], [23, 'view', 'Natación'], [25, 'click', 'Deportistas']],
+        ...athleteOnboarding,
+        [10, [1, 'click', 'Resumen'], [3, 'view', 'Actividad financiera'], [6, 'view', 'Lucía Ríos']],
     ] },
+    'deportistas-perfil': { page: 'athletes.index', beats: athleteOnboarding },
     inscripciones: { page: 'enrollments.index', beats: [
         [6, [2, 'click', 'Crear inscripción']],
-        [11, [1, 'click', 'Deportista'], [3, 'click', 'Lucía Ríos'], [5, 'click', 'Disciplina'], [7, 'click', 'Natación'], [9, 'click', 'Continuar']],
+        [14, [1, 'click', 'Continuar'], [2.5, 'view', 'Selecciona un deportista.'], [4, 'click', 'Deportista'], [6, 'click', 'Lucía Ríos'], [8, 'click', 'Disciplina'], [10, 'click', 'Natación'], [12, 'click', 'Continuar']],
         [12, [1, 'click', 'Fecha de inicio'], [3, 'click', '18'], [5, 'type', 'Mensualidad', '85000'], [8, 'type', 'Día de vencimiento', '18']],
         [31, [1, 'click', 'Crear inscripción'], [18, 'view', 'Lucía Ríos'], [20, 'click', 'Activar inscripción'], [23, 'click', 'Activar'], [27, 'view', 'Activa']],
     ] },

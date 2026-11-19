@@ -37,7 +37,7 @@ No cambies el `.env` del usuario para hacer esta verificación.
 ## Estructura relevante
 
 - `resources/js/Pages/Welcome.tsx`: landing pública con hero, mockup de dashboard y animaciones Framer Motion.
-- `resources/js/Pages/Dashboard.tsx`: dashboard inicial con datos vacíos reales y estados de onboarding.
+- `resources/js/Pages/Dashboard.tsx`: resumen del club activo, actividad financiera por mes, últimos pagos y acceso al modal de primeros pasos.
 - `resources/js/Layouts/AuthenticatedLayout.tsx`: sidebar, header, selector de club visual, navegación móvil y navegación inferior.
 - `resources/js/Layouts/GuestLayout.tsx`: layout visual compartido por login, registro y recuperación.
 - `resources/js/Pages/Auth/Login.tsx`: login NEXO estilizado.
@@ -106,7 +106,7 @@ Seeders: `SuperadminUserSeeder`, `AdminUserSeeder`, `UsuarioUserSeeder`, `Contad
 
 ## Flujo operativo implementado
 
-1. El administrador registra al deportista. El perfil es permanente y no requiere fecha final.
+1. El administrador registra al deportista. El perfil es permanente y desde el mismo formulario puede registrar el primer pago y activar la inscripción, crear el primer cargo pendiente o guardar solo el perfil.
 2. Crea una inscripción asociando deportista, disciplina, fecha de inicio, mensualidad y día de vencimiento.
 3. La inscripción usa los estados `pending`, `active`, `suspended` y `cancelled`.
 4. Al activar una inscripción cuya fecha de inicio ya llegó, se crea inmediatamente el cargo del periodo actual.

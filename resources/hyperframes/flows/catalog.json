@@ -75,8 +75,8 @@
         "Compara deportistas activos, inscripciones del mes, recaudo del mes y saldo pendiente."
       ],
       [
-        "Revisa los pagos recientes",
-        "Consulta la lista de deportistas con pagos recientes. Abre Recaudos para revisar el importe, el periodo y el vencimiento de los cargos."
+        "Revisa el recaudo del club",
+        "Actividad financiera muestra el recaudo por fecha de pago y la cartera abierta por mes de vencimiento. En Últimos pagos se ve el deportista, la fecha y el importe."
       ],
       [
         "Abre la configuración",
@@ -173,34 +173,86 @@
     ]
   },
   {
+    "id": "primeros-pasos-club",
+    "module": "Resumen",
+    "title": "Primeros pasos del club",
+    "component": "Dashboard → Clubs/Index → Disciplines/Index → Athletes/Index → Enrollments/Index → Memberships/Index",
+    "roles": [
+      "Admin"
+    ],
+    "description": "Prepara el club y una disciplina, registra al primer deportista con su pago y comprueba el resultado en Inscripciones, Recaudos y Resumen.",
+    "steps": [
+      [
+        "Prepara el club activo",
+        "Desde Resumen puedes revisar Primeros pasos. Abre Configurar club, verifica el club activo y guarda la información necesaria."
+      ],
+      [
+        "Crea la disciplina",
+        "En Disciplinas, escribe el nombre y pulsa Crear disciplina. Al quedar activa, aparecerá en el formulario del deportista."
+      ],
+      [
+        "Abre el alta del deportista",
+        "En Deportistas, pulsa Crear deportista. Completa nombres, apellidos y los datos de identificación."
+      ],
+      [
+        "Completa el contacto",
+        "Agrega el correo para vincular el acceso al portal y los datos del acudiente cuando apliquen. Sin correo, se guarda un perfil interno."
+      ],
+      [
+        "Revisa los datos opcionales",
+        "Agrega una foto o medidas si las tienes. Pulsa Continuar para llegar a Inscripción y acceso."
+      ],
+      [
+        "Elige cómo guardar",
+        "Para inscribirlo, elige disciplina, periodicidad, valor del periodo y día de vencimiento. Si falta el pago, usa Crear con cargo pendiente. Para inscribirlo más adelante, elige Solo perfil."
+      ],
+      [
+        "Registra el pago ya recibido",
+        "En Primer recaudo, elige Registrar pago recibido ahora y selecciona el medio. Pulsa Registrar pago y activar. La inscripción y el primer periodo comienzan en la fecha del pago."
+      ],
+      [
+        "Comprueba la inscripción y el cargo",
+        "En Inscripciones, verifica que figure Activa. En Recaudos, filtra Pagados y confirma el mismo cargo. Si elegiste dejarlo pendiente, al confirmar el primer pago se fijará el inicio efectivo."
+      ],
+      [
+        "Revisa el recaudo en Resumen",
+        "Vuelve al Resumen del club. El pago registrado aparece en Últimos pagos y en el mes correspondiente de Actividad financiera."
+      ]
+    ]
+  },
+  {
     "id": "deportistas-perfil",
     "module": "Deportistas",
-    "title": "Registrar un deportista",
+    "title": "Registrar un deportista y activar su inscripción con el primer pago",
     "component": "Athletes/Index",
     "roles": [
       "Admin"
     ],
-    "description": "Crea el perfil permanente y, si aplica, configura el acceso y la primera inscripción.",
+    "description": "Crea el perfil, registra el pago recibido y activa la inscripción desde el mismo formulario. También puedes crear el cargo pendiente o guardar solo el perfil.",
     "steps": [
       [
         "Abre el alta del deportista",
-        "En Deportistas, pulsa Crear deportista. Completa nombres, apellidos y los datos de identificación disponibles."
+        "En Deportistas, pulsa Crear deportista. Completa nombres, apellidos y los datos de identificación."
       ],
       [
         "Completa el contacto",
-        "Agrega los datos de contacto y del acudiente cuando apliquen. El correo vincula el acceso al portal. Si se omite, el perfil queda como registro interno."
+        "Agrega el correo para vincular el acceso al portal y los datos del acudiente cuando apliquen. Sin correo, se guarda un perfil interno."
       ],
       [
-        "Agrega datos físicos y foto",
-        "Completa las medidas, tallas o foto disponibles. Puedes dejar vacíos los datos opcionales."
+        "Revisa los datos opcionales",
+        "Agrega una foto o medidas si las tienes. Pulsa Continuar para llegar a Inscripción y acceso."
       ],
       [
-        "Decide si inscribir al deportista",
-        "Si ya conoces la disciplina, selecciona el inicio, la periodicidad, el valor del periodo y el día de vencimiento. Si todavía no vas a inscribirlo, guarda solo el perfil."
+        "Elige cómo guardar",
+        "Para inscribirlo, elige disciplina, periodicidad, valor del periodo y día de vencimiento. Si falta el pago, usa Crear con cargo pendiente. Para inscribirlo más adelante, elige Solo perfil."
       ],
       [
-        "Verifica el alta",
-        "Espera el progreso de creación y revisa el perfil en el listado. Usa Editar para actualizar los datos o el control de estado si cambia su disponibilidad."
+        "Registra el pago ya recibido",
+        "En Primer recaudo, elige Registrar pago recibido ahora y selecciona el medio. Pulsa Registrar pago y activar. La inscripción y el primer periodo comienzan en la fecha del pago."
+      ],
+      [
+        "Comprueba la inscripción y el cargo",
+        "En Inscripciones, verifica que figure Activa. En Recaudos, filtra Pagados y confirma el mismo cargo. Si elegiste dejarlo pendiente, al confirmar el primer pago se fijará el inicio efectivo."
       ]
     ]
   },
@@ -212,15 +264,15 @@
     "roles": [
       "Admin"
     ],
-    "description": "Asocia a un deportista con una disciplina y configura las condiciones de cobro.",
+    "description": "Inscripción por separado para perfiles existentes y revisión del estado de las inscripciones creadas desde Deportistas.",
     "steps": [
       [
         "Abre una nueva inscripción",
-        "En Inscripciones, pulsa Crear inscripción. El deportista y la disciplina deben estar disponibles en el club activo."
+        "Abre Crear inscripción si el perfil existente todavía necesita una inscripción. Si ya la creaste en Deportistas, ubícala en la lista para revisar su estado."
       ],
       [
         "Selecciona deportista y disciplina",
-        "Busca y elige ambos registros en los selectores. Pulsa Continuar para configurar el cobro."
+        "Elige el deportista y la disciplina del club activo. El formulario te avisa si falta alguna selección antes de continuar."
       ],
       [
         "Define las condiciones de cobro",
@@ -228,7 +280,7 @@
       ],
       [
         "Guarda y revisa el estado",
-        "Pulsa Crear inscripción y espera la confirmación. La inscripción empieza Pendiente. Si la creaste por separado, usa Activar inscripción y confirma para que se genere el cargo cuando corresponda. Si el alta del deportista ya generó un cargo, el pago puede activar la inscripción pendiente."
+        "El alta por separado empieza Pendiente. Puedes activarla para generar el cargo cuando corresponda. Si el primer pago ya se registró en Deportistas, la inscripción figura Activa y el cargo figura Pagado."
       ]
     ]
   },
@@ -245,7 +297,7 @@
     "steps": [
       [
         "Consulta los cargos",
-        "En Recaudos, usa los estados disponibles para encontrar el cargo. Verifica el deportista, la disciplina, el periodo, el vencimiento y el importe."
+        "Usa Pagados para comprobar un primer pago registrado durante el alta. Para un cargo pendiente, verifica el deportista, la disciplina, el periodo y el importe antes de registrar el pago."
       ],
       [
         "Revisa el soporte recibido",
@@ -257,7 +309,7 @@
       ],
       [
         "Confirma el resultado",
-        "Comprueba el estado del cargo y del comprobante. El pago puede reactivar una inscripción pendiente o suspendida."
+        "Verifica que el cargo aparezca como Pagada. Si confirmaste el primer pago de una inscripción pendiente, la fecha de confirmación fija el inicio de la inscripción y del periodo."
       ]
     ]
   },
@@ -402,13 +454,28 @@
     "module": "Notificaciones",
     "title": "Gestionar avisos de cobro desde la plataforma",
     "component": "Memberships/Index · AdminBillingNotifications",
-    "roles": ["Admin", "Contador"],
+    "roles": [
+      "Admin",
+      "Contador"
+    ],
     "description": "Consulta los estados que activan los recordatorios, la suspensión y el aviso posterior.",
     "steps": [
-      ["Consulta el cargo", "En Recaudos revisa el periodo, el importe y la fecha de vencimiento del cargo."],
-      ["Abre la campana", "El administrador puede consultar los cobros pendientes del club activo y su valor en la campana."],
-      ["Consulta el cobro vencido", "Si el cargo sigue impago al corte del día siguiente, la inscripción queda suspendida y el cobro vencido sigue visible en la campana."],
-      ["Registra el pago recibido", "Abre Recaudos y registra el pago. El cargo queda pagado y la inscripción suspendida se reactiva."]
+      [
+        "Consulta el cargo",
+        "En Recaudos revisa el periodo, el importe y la fecha de vencimiento del cargo."
+      ],
+      [
+        "Abre la campana",
+        "El administrador puede consultar los cobros pendientes del club activo y su valor en la campana."
+      ],
+      [
+        "Consulta el cobro vencido",
+        "Si el cargo sigue impago al corte del día siguiente, la inscripción queda suspendida y el cobro vencido sigue visible en la campana."
+      ],
+      [
+        "Registra el pago recibido",
+        "Abre Recaudos y registra el pago. El cargo queda pagado y la inscripción suspendida se reactiva."
+      ]
     ]
   },
   {
@@ -416,14 +483,32 @@
     "module": "Notificaciones",
     "title": "Leer los correos de facturación",
     "component": "PaymentReminderMail · OutstandingChargesReportMail · EnrollmentSuspendedMail · AthleteSubscriptionActivatedMail",
-    "roles": ["Admin", "Deportista"],
+    "roles": [
+      "Admin",
+      "Deportista"
+    ],
     "description": "Reconoce cada correo y actúa según el estado del cobro o la inscripción.",
     "steps": [
-      ["Recibe el recordatorio", "Si el cobro pendiente ya existe y la inscripción está activa, el deportista recibe un recordatorio el día anterior al vencimiento."],
-      ["Revisa el vencimiento", "A las 08:00 del día del vencimiento, el deportista recibe el aviso con el valor y la fecha del cobro impago."],
-      ["Abre el reporte del club", "El administrador ve los cobros en el correo y puede abrir WhatsApp si el deportista tiene teléfono. El Excel adjunto incluye el detalle por período."],
-      ["Recibe el aviso de suspensión", "Si la inscripción sigue suspendida cinco días después del corte, llega un aviso al deportista y a los administradores del club."],
-      ["Confirma la reactivación", "Cuando el administrador registra o aprueba el pago, la inscripción se reactiva y el deportista recibe la confirmación."]
+      [
+        "Recibe el recordatorio",
+        "Si el cobro pendiente ya existe y la inscripción está activa, el deportista recibe un recordatorio el día anterior al vencimiento."
+      ],
+      [
+        "Revisa el vencimiento",
+        "A las 08:00 del día del vencimiento, el deportista recibe el aviso con el valor y la fecha del cobro impago."
+      ],
+      [
+        "Abre el reporte del club",
+        "El administrador ve los cobros en el correo y puede abrir WhatsApp si el deportista tiene teléfono. El Excel adjunto incluye el detalle por período."
+      ],
+      [
+        "Recibe el aviso de suspensión",
+        "Si la inscripción sigue suspendida cinco días después del corte, llega un aviso al deportista y a los administradores del club."
+      ],
+      [
+        "Confirma la reactivación",
+        "Cuando el administrador registra o aprueba el pago, la inscripción se reactiva y el deportista recibe la confirmación."
+      ]
     ]
   }
 ]

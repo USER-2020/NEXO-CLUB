@@ -14,7 +14,13 @@
         default => 'Mensual',
     } }}</p>
     <p><strong>Fecha de inicio:</strong> {{ $enrollment->start_date?->format('d/m/Y') }}</p>
-    <p><strong>Próximo cobro:</strong> {{ $enrollment->charges->sortBy('due_date')->first()?->due_date?->format('d/m/Y') ?? 'Pendiente de generar' }}</p>
+    @php($firstCharge = $enrollment->charges->sortBy('due_date')->first())
+    @if ($firstCharge?->status === 'paid')
+        <p><strong>Primer pago:</strong> registrado el {{ $firstCharge->paid_at?->format('d/m/Y') }}.</p>
+        <p><strong>Siguiente periodo:</strong> comienza el {{ $firstCharge->period_end?->copy()->addDay()->format('d/m/Y') }}.</p>
+    @else
+        <p><strong>Primer cobro:</strong> {{ $firstCharge?->due_date?->format('d/m/Y') ?? 'Pendiente de generar' }}</p>
+    @endif
     <p><strong>Estado:</strong> {{ $enrollment->status === 'active' ? 'Activa' : 'Pendiente del primer pago' }}</p>
 @endif
 <p>Ingresa desde <a href="{{ url('/login') }}">NEXO CLUB</a> y cambia tu contraseña desde tu perfil.</p>
