@@ -36,12 +36,16 @@
 - [x] Registro público de clubes con datos esenciales, cuenta inactiva y solicitud pendiente de aprobación.
 - [x] Flujo de superadmin para aprobar/rechazar solicitudes; la aprobación crea el club y activa al administrador principal.
 - [x] Correos de recepción y activación de solicitudes de club, condicionados a `NEXO_NOTIFICATIONS_ENABLED=true` y SMTP configurado.
+- [x] Flujo de notificaciones de facturación: recordatorio, reporte administrativo, suspensión diferida a cinco días, aviso al deportista y reactivación por pago.
+- [x] Cargos recurrentes alineados con el día de vencimiento configurado y migración `suspension_notified_at` para evitar duplicados.
 
 ## 2026-11-18 — Documentación por módulo y primer recaudo
 
 - [x] Catálogo con videos de los componentes reales y detalle paso a paso por tarjeta. Acceso de Superadmin, clubes globales y auditoría se sirven mediante rutas de plataforma protegidas.
 - [x] Recorrido general renovado y capítulos de configuración, disciplinas, deportistas, inscripciones y recaudos reutilizados en el modal de cada inicio de sesión del administrador.
 - [x] Pruebas del modal por sesión y del alta con correo hasta que el primer recaudo activa la inscripción.
+- [x] Hyperframes de notificaciones desde Recaudos y desde la vista de correo, con estados de recordatorio, vencimiento, suspensión y reactivación.
+- [x] Reporte administrativo con lista en el correo, enlaces a WhatsApp y adjunto Excel `.xlsx`. Validación del corte y de la aceptación por SMTP con un cargo de prueba.
 
 ## Siguiente fase
 

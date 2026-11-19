@@ -8,12 +8,12 @@ import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { ArrowLeft, ArrowRight, Camera, Check, Edit3, UserPlus, Users, X } from 'lucide-react';
 import { confirmToast } from '@/Components/ConfirmToast';
 import Pagination from '@/Components/Pagination';
+import { billingFrequencies } from '@/lib/billing';
 
 type Athlete = { id: number; first_name: string; last_name: string; document_type: string; document_number?: string | null; birth_date?: string | null; height_cm?: string | null; weight_kg?: string | null; shirt_size?: string | null; shoe_size?: string | null; phone?: string | null; email?: string | null; guardian_name?: string | null; guardian_phone?: string | null; status: string; has_photo: boolean; active_enrollments_count: number; current_enrollment?: { discipline_id: number; start_date: string; billing_frequency: string; monthly_amount: number; due_day: number } | null };
 type Discipline = { id: number; name: string };
 type FormData = { first_name: string; last_name: string; document_type: string; document_number: string; birth_date: string; height_cm: string; weight_kg: string; shirt_size: string; shoe_size: string; phone: string; email: string; guardian_name: string; guardian_phone: string; photo: File | null; discipline_id: string; start_date: string; billing_frequency: string; monthly_amount: string; due_day: string };
 const documentTypes = [{ id: 'tarjeta_identidad', label: 'Tarjeta de identidad' }, { id: 'cedula_ciudadania', label: 'Cédula de ciudadanía' }, { id: 'pasaporte', label: 'Pasaporte' }, { id: 'otro', label: 'Otro' }];
-const billingFrequencies = [{ id: 'monthly', label: 'Mensual' }, { id: 'biweekly', label: 'Quincenal' }, { id: 'quarterly', label: 'Trimestral' }, { id: 'semiannual', label: 'Semestral' }, { id: 'annual', label: 'Anual' }];
 const today = new Date().toISOString().slice(0, 10);
 const emptyForm: FormData = { first_name: '', last_name: '', document_type: 'cedula_ciudadania', document_number: '', birth_date: '', height_cm: '', weight_kg: '', shirt_size: '', shoe_size: '', phone: '', email: '', guardian_name: '', guardian_phone: '', photo: null, discipline_id: '', start_date: today, billing_frequency: 'monthly', monthly_amount: '', due_day: String(new Date().getDate()) };
 

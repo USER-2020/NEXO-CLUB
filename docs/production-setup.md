@@ -139,7 +139,7 @@ HOSTINGER_PORT       # opcional; por defecto 65002
 HOSTINGER_APP_PATH   # ruta absoluta del proyecto Laravel
 ```
 
-El workflow preserva `.env`, `storage` y la base de datos del servidor. Antes del primer despliegue, ejecuta una vez en Hostinger:
+El paquete excluye `.env`, `storage` y la base SQLite local. Al instalarlo en Hostinger, conserva el entorno, el almacenamiento y la base de datos del servidor. En el primer despliegue, ejecuta en Hostinger:
 
 ```bash
 cd /home/usuario/apps/nexo-club
@@ -154,7 +154,7 @@ Cada push exitoso a `main` crea automáticamente el release/tag. También puede 
 - Protege la rama `main` y exige que `CI` pase antes de hacer merge.
 - Usa el environment `production` con aprobación manual si el proyecto lo requiere.
 - No guardes `APP_KEY`, credenciales de base de datos, SMTP ni la clave SSH en el repositorio.
-- Haz backup de la base de datos antes de migraciones destructivas; el workflow ejecuta `migrate --force`, pero no realiza backups automáticamente.
+- Haz una copia de seguridad antes de una migración destructiva. Ejecuta las migraciones desde el servidor como parte del despliegue.
 
 ## 5. Seeders que no deben ejecutarse en producción
 
@@ -172,7 +172,15 @@ En producción, el superadmin debe crear desde la plataforma los clubes, adminis
 
 ## 6. Configurar correo electrónico
 
-Para habilitar notificaciones reales, configura SMTP:
+El reporte de recaudos genera un adjunto `.xlsx` mediante PhpSpreadsheet. El PHP que ejecuta Artisan debe tener habilitadas las extensiones GD y ZIP. Usa `composer check-platform-reqs --no-dev` para revisar las extensiones de la instalación.
+
+Antes de ejecutar los jobs con la versión que incluye el aviso de suspensión, aplica las migraciones del despliegue.
+
+```bash
+php artisan migrate --force
+```
+
+Para habilitar notificaciones reales, configura SMTP.
 
 ```env
 MAIL_MAILER=smtp
@@ -197,6 +205,30 @@ Y programa el scheduler:
 
 ```bash
 php artisan schedule:work
+```
+
+En producción con cron, ejecuta el scheduler cada minuto para que Laravel dispare los cortes de las 00:10 y los correos de las 08:00 en `America/Bogota`:
+
+```cron
+* * * * * cd /ruta/a/NEXO-CLUB && php artisan schedule:run
+```
+
+El corte de las 00:10 genera el siguiente cargo y suspende las inscripciones con cargos vencidos sin pago. El proceso de las 08:00 envía recordatorios, el reporte del administrador y, cuando han transcurrido cinco días desde `suspended_at`, el aviso de suspensión al deportista y al administrador. Para ejecutar ambos procesos manualmente:
+
+```bash
+php artisan billing:generate-monthly-charges
+php artisan billing:send-notifications
+```
+
+El comando de generación imprime cuántos cargos creó y cuántas inscripciones suspendió. El comando de notificaciones imprime los destinatarios procesados y sus correos únicos. La bandeja del destinatario o el proveedor SMTP permiten verificar la entrega.
+
+Para probar el aviso del día, verifica primero en **Recaudos** que haya un cargo **Pendiente** con vencimiento ese día y que la inscripción esté **Activa**. Editar el día de vencimiento conserva los cargos existentes. [Reglas de fechas y suspensión](billing-rules.md#cambios-de-fecha-y-cobros-existentes)
+
+En producción, ambos comandos procesan los registros elegibles de la base conectada. Usa `--date=Y-m-d` en una base aislada para probar otras fechas. La opción cambia la fecha de evaluación. Los comandos siguen escribiendo en la base conectada y usan el transporte de correo configurado.
+
+```bash
+php artisan billing:generate-monthly-charges --date=2026-11-18
+php artisan billing:send-notifications --date=2026-11-18
 ```
 
 ## 7. Verificación final

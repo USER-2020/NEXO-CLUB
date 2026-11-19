@@ -32,7 +32,7 @@ Una obligación (`monthly_charges`) es distinta de un pago (`payments`). El MVP 
 
 ## Tareas asíncronas
 
-La generación mensual se ejecuta con Scheduler y es idempotente mediante una restricción única por inscripción y período. Los recordatorios por correo/WhatsApp y Jobs de notificación quedan para la siguiente fase.
+La generación mensual se ejecuta con Scheduler y es idempotente mediante una restricción única por inscripción y período. Los correos de vencimiento, reportes administrativos, suspensión diferida y reactivación se procesan con los comandos programados de facturación.
 
 ## PWA y privacidad
 
@@ -46,6 +46,7 @@ La PWA precachea recursos estáticos y no almacena datos financieros ni perfiles
 - Cada club puede registrar varios medios de pago en `club_payment_methods`: cuentas bancarias, Nequi, Bre-B y llaves. Los registros pertenecen al club activo y pueden activarse o desactivarse.
 - Los campos sensibles de `club_payment_methods` (`account_number`, `account_holder`, `holder_document`) se cifran en reposo. El rol `admin` los gestiona y visualiza completos; `superadmin` solo ve una representación enmascarada, como `****12`.
 - La infraestructura de correos está preparada pero apagada por defecto con `NEXO_NOTIFICATIONS_ENABLED=false`; requiere SMTP antes de activarse.
+- `billing:generate-monthly-charges` corre a las 00:10. `billing:send-notifications` corre a las 08:00. La suspensión se produce al día siguiente de un vencimiento impago y el aviso formal se envía cinco días después de `suspended_at`, una sola vez por suspensión.
 - Las solicitudes públicas de club viven en `club_applications`. Con las notificaciones habilitadas, el solicitante recibe confirmación de recepción y, después de la aprobación, un correo de activación con el enlace de acceso.
 - Los comprobantes se guardan en el disco privado local (`storage/app/private`) y solo se descargan mediante rutas autenticadas del deportista propietario o del equipo autorizado del club. Aprobar un comprobante crea el `payment`, marca el cargo como pagado y reactiva una inscripción suspendida dentro de una transacción.
 - La zona horaria del club se conserva como dato configurable para soportar posteriormente clubes en distintas regiones.

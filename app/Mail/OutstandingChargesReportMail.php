@@ -14,7 +14,7 @@ class OutstandingChargesReportMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public function __construct(public Club $club, public string $excel) {}
+    public function __construct(public Club $club, public array $charges, private string $xlsx) {}
 
     public function envelope(): Envelope
     {
@@ -28,6 +28,7 @@ class OutstandingChargesReportMail extends Mailable
 
     public function attachments(): array
     {
-        return [Attachment::fromData(fn () => $this->excel, 'pendientes-por-cobrar.xls')->withMime('application/vnd.ms-excel')];
+        return [Attachment::fromData(fn () => $this->xlsx, 'pendientes-por-cobrar.xlsx')
+            ->withMime('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')];
     }
 }

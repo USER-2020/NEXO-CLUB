@@ -40,19 +40,21 @@ class HandleInertiaRequests extends Middleware
 
         $adminBillingNotifications = ['count' => 0, 'total' => 0, 'items' => []];
         if ($user && $activeClub && $user->hasRole('admin')) {
-            $charges = MonthlyCharge::query()
-                ->with(['enrollment.athlete:id,first_name,last_name', 'enrollment.discipline:id,name'])
+            $outstanding = MonthlyCharge::query()
                 ->where('club_id', $activeClub->id)
                 ->whereIn('status', ['pending', 'overdue'])
-                ->whereHas('enrollment', fn ($query) => $query->where('status', 'active'))
+                ->whereHas('enrollment', fn ($query) => $query->where('club_id', $activeClub->id)->whereIn('status', ['active', 'suspended']));
+            $totals = (clone $outstanding)->selectRaw('COUNT(*) AS charge_count, SUM(amount) AS charge_total')->first();
+            $charges = $outstanding
+                ->with(['enrollment.athlete:id,first_name,last_name', 'enrollment.discipline:id,name'])
                 ->orderByRaw("CASE WHEN status = 'overdue' THEN 0 ELSE 1 END")
                 ->orderBy('due_date')
                 ->limit(50)
                 ->get();
 
             $adminBillingNotifications = [
-                'count' => $charges->count(),
-                'total' => $charges->sum('amount'),
+                'count' => (int) $totals->charge_count,
+                'total' => (int) $totals->charge_total,
                 'items' => $charges->map(fn (MonthlyCharge $charge) => [
                     'id' => $charge->id,
                     'athlete' => trim($charge->enrollment->athlete->first_name.' '.$charge->enrollment->athlete->last_name),

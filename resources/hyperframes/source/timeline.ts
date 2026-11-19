@@ -51,11 +51,11 @@ export function walk({ composition, catalog, host, reset, processTime, perform, 
                 || [...element.children].some((child) => child.tagName === 'SPAN' && child.textContent?.trim() === target)));
         const field = label?.querySelector<HTMLElement>(kind === 'type' ? 'input:not([type=hidden]), textarea' : 'button');
         if (field) return field;
-        const activeDialog = [...host.querySelectorAll<HTMLElement>('[role=dialog], [role=alertdialog]')].filter(visible).at(-1);
+        const activeDialog = [...document.querySelectorAll<HTMLElement>('[role=dialog], [role=alertdialog]')].filter(visible).at(-1);
         const controls = [...(activeDialog ?? host).querySelectorAll<HTMLElement>('button, a, [role=button], [role=link]')];
         const control = controls.find((element) => visible(element) && (element.textContent?.trim() === target || element.getAttribute('aria-label') === target || (element.getAttribute('role') === 'link' && element.querySelector('h2,h3')?.textContent?.trim() === target)));
         if (control) return control;
-        if (kind === 'view') return [...host.querySelectorAll<HTMLElement>('h1,h2,h3,p,span,div,td')].find((element) =>
+        if (kind === 'view') return [...(activeDialog ?? host).querySelectorAll<HTMLElement>('h1,h2,h3,p,span,div,td')].find((element) =>
             visible(element) && element.textContent?.trim() === target);
         return null;
     }
@@ -91,7 +91,7 @@ export function walk({ composition, catalog, host, reset, processTime, perform, 
 
     function act(work: Action, time: number) {
         const [, kind, target, value] = work;
-        if (kind === 'page' || kind === 'resolve') { perform(work); return; }
+        if (kind === 'page' || kind === 'email' || kind === 'billing-cut' || kind === 'resolve') { perform(work); return; }
         const element = find(target!, kind);
         if (!element) throw new Error(`${composition} · ${time}s · ${kind} · ${target} no disponible`);
         const anchor = kind === 'file' ? element.closest('label') ?? element : element;

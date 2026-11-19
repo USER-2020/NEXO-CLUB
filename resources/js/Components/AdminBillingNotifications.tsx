@@ -1,6 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
 import { AlertCircle, Bell, CheckCircle2, Clock3 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { formatAppDate } from '@/lib/dates';
 import { Sheet, SheetBody, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/Components/ui/sheet';
 
@@ -11,21 +11,11 @@ const money = (value: number) => new Intl.NumberFormat('es-CO', { style: 'curren
 export default function AdminBillingNotifications() {
     const { auth, adminBillingNotifications } = usePage().props as NotificationProps;
     const [open, setOpen] = useState(false);
-    const ref = useRef<HTMLDivElement>(null);
     const notifications = adminBillingNotifications ?? { count: 0, total: 0, items: [] };
-
-    useEffect(() => {
-        if (!open) return;
-        const close = (event: MouseEvent) => {
-            if (ref.current && !ref.current.contains(event.target as Node)) setOpen(false);
-        };
-        document.addEventListener('mousedown', close);
-        return () => document.removeEventListener('mousedown', close);
-    }, [open]);
 
     if (auth?.user?.role !== 'admin') return null;
 
-    return <div ref={ref} className="relative z-[60] shrink-0" data-tour="admin-billing-notifications">
+    return <div className="relative z-[60] shrink-0" data-tour="admin-billing-notifications">
         <button type="button" onClick={() => setOpen(true)} aria-label="Abrir centro de notificaciones" aria-expanded={open} className={open ? 'relative flex h-11 w-11 items-center justify-center rounded-xl bg-slate-800 text-nexo-lime transition focus:outline-none focus:ring-2 focus:ring-nexo-lime' : 'relative flex h-11 w-11 items-center justify-center rounded-xl text-slate-400 transition hover:bg-slate-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-nexo-lime'}>
             <Bell size={20} />
             {notifications.count > 0 && <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-nexo-ink bg-red-400 px-1 text-[9px] font-extrabold text-nexo-ink">{notifications.count > 99 ? '99+' : notifications.count}</span>}

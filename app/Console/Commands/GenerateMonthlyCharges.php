@@ -32,7 +32,7 @@ class GenerateMonthlyCharges extends Command
                     if ($latest && $latest->status !== 'paid' && $latest->due_date->lt($today)) {
                         $latest->update(['status' => 'overdue']);
                         if ($enrollment->status !== 'suspended') {
-                            $enrollment->update(['status' => 'suspended', 'suspended_at' => $today, 'suspension_reason' => 'Recaudo vencido']);
+                            $enrollment->update(['status' => 'suspended', 'suspended_at' => $today, 'suspension_reason' => 'Recaudo vencido', 'suspension_notified_at' => null]);
                             $overdue++;
                         }
                         continue;
@@ -42,7 +42,7 @@ class GenerateMonthlyCharges extends Command
                         continue;
                     }
                     $periodEnd = app(BillingPeriodService::class)->end($period, $enrollment->billing_frequency ?? 'monthly');
-                    $dueDate = $period->copy();
+                    $dueDate = $period->copy()->day(min((int) $enrollment->due_day, $period->daysInMonth));
                     $charge = MonthlyCharge::firstOrCreate(
                         ['enrollment_id' => $enrollment->id, 'period' => $period->toDateString()],
                         ['club_id' => $enrollment->club_id, 'period_end' => $periodEnd->toDateString(), 'due_date' => $dueDate->toDateString(), 'amount' => $enrollment->monthly_amount, 'status' => $dueDate->lt($today) ? 'overdue' : 'pending'],
@@ -55,7 +55,7 @@ class GenerateMonthlyCharges extends Command
                     if ($charge->status !== 'paid' && $dueDate->lt($today)) {
                         $charge->update(['status' => 'overdue']);
                         if ($enrollment->status !== 'suspended') {
-                            $enrollment->update(['status' => 'suspended', 'suspended_at' => $today, 'suspension_reason' => 'Mensualidad vencida']);
+                            $enrollment->update(['status' => 'suspended', 'suspended_at' => $today, 'suspension_reason' => 'Mensualidad vencida', 'suspension_notified_at' => null]);
                             $overdue++;
                         }
                     }

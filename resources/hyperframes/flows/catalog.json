@@ -396,5 +396,34 @@
         "Escribe la contraseña actual, la nueva y su confirmación en el formulario de seguridad. Guarda y revisa los mensajes debajo de cada campo."
       ]
     ]
+  },
+  {
+    "id": "notificaciones-plataforma",
+    "module": "Notificaciones",
+    "title": "Gestionar avisos de cobro desde la plataforma",
+    "component": "Memberships/Index · AdminBillingNotifications",
+    "roles": ["Admin", "Contador"],
+    "description": "Consulta los estados que activan los recordatorios, la suspensión y el aviso posterior.",
+    "steps": [
+      ["Consulta el cargo", "En Recaudos revisa el periodo, el importe y la fecha de vencimiento del cargo."],
+      ["Abre la campana", "El administrador puede consultar los cobros pendientes del club activo y su valor en la campana."],
+      ["Consulta el cobro vencido", "Si el cargo sigue impago al corte del día siguiente, la inscripción queda suspendida y el cobro vencido sigue visible en la campana."],
+      ["Registra el pago recibido", "Abre Recaudos y registra el pago. El cargo queda pagado y la inscripción suspendida se reactiva."]
+    ]
+  },
+  {
+    "id": "notificaciones-correo",
+    "module": "Notificaciones",
+    "title": "Leer los correos de facturación",
+    "component": "PaymentReminderMail · OutstandingChargesReportMail · EnrollmentSuspendedMail · AthleteSubscriptionActivatedMail",
+    "roles": ["Admin", "Deportista"],
+    "description": "Reconoce cada correo y actúa según el estado del cobro o la inscripción.",
+    "steps": [
+      ["Recibe el recordatorio", "Si el cobro pendiente ya existe y la inscripción está activa, el deportista recibe un recordatorio el día anterior al vencimiento."],
+      ["Revisa el vencimiento", "A las 08:00 del día del vencimiento, el deportista recibe el aviso con el valor y la fecha del cobro impago."],
+      ["Abre el reporte del club", "El administrador ve los cobros en el correo y puede abrir WhatsApp si el deportista tiene teléfono. El Excel adjunto incluye el detalle por período."],
+      ["Recibe el aviso de suspensión", "Si la inscripción sigue suspendida cinco días después del corte, llega un aviso al deportista y a los administradores del club."],
+      ["Confirma la reactivación", "Cuando el administrador registra o aprueba el pago, la inscripción se reactiva y el deportista recibe la confirmación."]
+    ]
   }
 ]

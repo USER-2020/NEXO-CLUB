@@ -13,7 +13,7 @@ class Enrollment extends Model
 
     protected $fillable = [
         'club_id', 'athlete_id', 'discipline_id', 'start_date', 'end_date',
-        'monthly_amount', 'billing_frequency', 'due_day', 'status', 'suspended_at', 'suspension_reason',
+        'monthly_amount', 'billing_frequency', 'due_day', 'status', 'suspended_at', 'suspension_reason', 'suspension_notified_at',
     ];
 
     protected function casts(): array
@@ -22,6 +22,7 @@ class Enrollment extends Model
             'start_date' => 'date',
             'end_date' => 'date',
             'suspended_at' => 'datetime',
+            'suspension_notified_at' => 'datetime',
             'monthly_amount' => 'integer',
             'due_day' => 'integer',
         ];

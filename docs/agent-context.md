@@ -111,9 +111,12 @@ Seeders: `SuperadminUserSeeder`, `AdminUserSeeder`, `UsuarioUserSeeder`, `Contad
 3. La inscripción usa los estados `pending`, `active`, `suspended` y `cancelled`.
 4. Al activar una inscripción cuya fecha de inicio ya llegó, se crea inmediatamente el cargo del periodo actual.
 5. `billing:generate-monthly-charges` crea los cargos mensuales siguientes de forma idempotente; no genera cargos antes de `start_date`.
-6. El día de vencimiento se toma inicialmente de la fecha de inicio, puede cambiarse entre 1 y 31 y se ajusta al último día del mes cuando corresponde.
-7. Un cargo vencido no pagado suspende la inscripción; registrar el pago puede reactivarla.
-8. El scheduler corre con `php artisan schedule:work` en desarrollo o cron en producción, diariamente a las 00:10.
+6. El día de vencimiento se toma inicialmente de la fecha de inicio, puede cambiarse entre 1 y 31 y se ajusta al último día del mes cuando corresponde. Los cargos futuros respetan ese valor; los cargos ya creados conservan su fecha.
+7. Un cargo vencido no pagado suspende la inscripción al siguiente corte; registrar el pago puede reactivarla.
+8. `billing:send-notifications` avisa al deportista el día anterior y el día del vencimiento, envía el reporte de pendientes al administrador y envía el aviso de suspensión cinco días después de `suspended_at`.
+9. `suspension_notified_at` evita repetir el aviso de suspensión. Al reactivar por pago se limpia ese campo.
+10. El scheduler corre con `php artisan schedule:work` en desarrollo o cron en producción, diariamente a las 00:10 y 08:00.
+11. `billing:send-notifications` imprime en consola los totales y correos únicos de deportistas y administradores procesados. Los comandos aceptan `--date=Y-m-d` para pruebas deterministas.
 
 El perfil incluye tipo de documento (tarjeta de identidad, cédula de ciudadanía, pasaporte u otro) y número de documento. Los datos físicos actuales son opcionales: estatura, peso, talla de ropa y talla de calzado. Tests, medidas históricas, mesociclos y macrociclos serán módulos posteriores.
 
@@ -122,7 +125,7 @@ El perfil incluye tipo de documento (tarjeta de identidad, cédula de ciudadaní
 1. Añadir historial de medidas, tests físicos y seguimiento de progreso.
 2. Implementar entrenadores, grupos, horarios, sesiones y asistencias.
 3. Mejorar Billing con pagos parciales, asignaciones, cartera y auditoría.
-4. Activar notificaciones internas/correo/Jobs cuando exista SMTP y aprobación funcional; la base de bienvenida, recordatorios y reporte CSV ya está preparada.
+4. Ampliar notificaciones internas y trazabilidad de entregas cuando exista un proveedor de cola o canal adicional. Los correos de facturación y suspensión ya están implementados y se activan con SMTP.
 5. Crear reportes, exportaciones autorizadas y pruebas adicionales de aislamiento multi-club.
 
 ## Decisiones pendientes

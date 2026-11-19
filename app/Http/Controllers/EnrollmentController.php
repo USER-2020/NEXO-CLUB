@@ -56,8 +56,8 @@ class EnrollmentController extends Controller
         abort_unless($enrollment->club_id === $club->id, 404);
         $data = $request->validate(['action' => ['required', Rule::in(['activate', 'suspend', 'cancel'])]]);
         $attributes = match ($data['action']) {
-            'activate' => ['status' => 'active', 'suspended_at' => null, 'suspension_reason' => null, 'end_date' => null],
-            'suspend' => ['status' => 'suspended', 'suspended_at' => now(), 'suspension_reason' => 'Suspendida por falta de pago'],
+            'activate' => ['status' => 'active', 'suspended_at' => null, 'suspension_reason' => null, 'suspension_notified_at' => null, 'end_date' => null],
+            'suspend' => ['status' => 'suspended', 'suspended_at' => now(), 'suspension_reason' => 'Suspendida por falta de pago', 'suspension_notified_at' => null],
             'cancel' => ['status' => 'cancelled', 'end_date' => Carbon::today()],
         };
         $enrollment->update($attributes);

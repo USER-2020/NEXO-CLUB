@@ -78,7 +78,7 @@ class BillingController extends Controller
             ]);
             $charge->update(['status' => 'paid', 'paid_at' => $paidAt]);
             if (in_array($charge->enrollment->status, ['pending', 'suspended'], true)) {
-                $charge->enrollment->update(['status' => 'active', 'suspended_at' => null, 'suspension_reason' => null]);
+                $charge->enrollment->update(['status' => 'active', 'suspended_at' => null, 'suspension_reason' => null, 'suspension_notified_at' => null]);
                 $activatedEnrollment = $charge->enrollment->fresh(['athlete', 'club', 'discipline', 'charges']);
             }
             $submission->update(['status' => 'approved', 'reviewed_by' => $request->user()->id, 'reviewed_at' => now()]);
@@ -124,7 +124,7 @@ class BillingController extends Controller
         Payment::create(['club_id' => $club->id, 'monthly_charge_id' => $charge->id, 'amount' => $charge->amount, 'paid_at' => $paidAt, ...$data]);
         $charge->update(['status' => 'paid', 'paid_at' => $paidAt]);
         if ($wasRestricted) {
-            $charge->enrollment->update(['status' => 'active', 'suspended_at' => null, 'suspension_reason' => null]);
+            $charge->enrollment->update(['status' => 'active', 'suspended_at' => null, 'suspension_reason' => null, 'suspension_notified_at' => null]);
         }
 
         $this->sendActivationEmail($wasRestricted ? $charge->enrollment->fresh(['athlete', 'club', 'discipline', 'charges']) : null);

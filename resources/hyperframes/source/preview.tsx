@@ -56,6 +56,16 @@ let time = 0;
 let flash = {};
 let userName = 'Ana Pérez';
 
+const suspensionSubject = 'Inscripción suspendida por falta de pago';
+const billingEmails: Record<string, { title: string; recipient: string; message: string; detail?: string; hasChargeList?: boolean }> = {
+    reminder: { title: 'Recordatorio de mensualidad', recipient: athlete.email, message: 'Hola Lucía, tienes un pago pendiente en el Club Horizonte. Consulta los medios de pago habilitados por el club en NEXO CLUB.', detail: 'Vence mañana, 18 de noviembre · $85.000 COP' },
+    due: { title: 'Tu mensualidad vence hoy', recipient: athlete.email, message: 'Hola Lucía, hoy vence tu pago de Natación en el Club Horizonte.', detail: 'Vencimiento 18 de noviembre · $85.000 COP' },
+    report: { title: 'Pendientes por cobrar · Club Horizonte', recipient: 'ana@example.test', message: 'Club Horizonte · 1 cobro', detail: 'pendientes-por-cobrar.xlsx', hasChargeList: true },
+    suspension: { title: suspensionSubject, recipient: athlete.email, message: 'Tu inscripción en Natación está suspendida. Comunícate con tu club para regularizar el pago.', detail: 'Vencimiento 18 de noviembre · $85.000 COP' },
+    'admin-suspension': { title: suspensionSubject, recipient: 'ana@example.test', message: 'La inscripción de Lucía Ríos en el Club Horizonte sigue suspendida por falta de pago.', detail: 'Vencimiento 18 de noviembre · $85.000 COP' },
+    activation: { title: 'Tu cuenta de NEXO CLUB ya está activa', recipient: athlete.email, message: 'Tu pago se registró y tu inscripción de Natación en el Club Horizonte ya está activa.' },
+};
+
 window.route = ((name?: string, args?: unknown) => name
     ? '/preview/' + name + (args == null ? '' : '/' + String(args))
     : { current: (key: string) => current === key }) as typeof window.route;
@@ -64,6 +74,18 @@ function paint() {
     const Page = pages[current as keyof typeof pages] as React.ComponentType<any>;
     const user = role === 'deportista' ? { name: athlete.name, email: athlete.email } : { name: userName, email: 'ana@example.test' };
     const pageProps = { ...props[current], auth: { user: { ...user, role, id: 1, email_verified_at: date } }, clubContext: { activeClub, clubs: [club, otherClub] }, platformAccess: { isSuperadmin: role === 'superadmin' }, flash };
+    if (scenarioId === 'notificaciones-plataforma') {
+        const outstanding = props['memberships.index'].charges.data.filter((entry: typeof charge) => entry.status !== 'paid');
+        pageProps.adminBillingNotifications = {
+            count: outstanding.length,
+            total: outstanding.reduce((sum: number, entry: typeof charge) => sum + entry.amount, 0),
+            items: outstanding.map((entry: typeof charge) => ({
+                id: entry.id, athlete: athlete.name, discipline: discipline.name, amount: entry.amount,
+                due_date: entry.due_date, status: entry.status,
+            })),
+        };
+    }
+    const email = billingEmails[overlay];
     flushSync(() => preview.render(
         <PreviewContext.Provider value={{ component: current, url: location.pathname, props: pageProps }}>
             <Page key={revision + current} {...pageProps} />
@@ -71,8 +93,22 @@ function paint() {
             {pending?.operation && <OperationProgressModal operation={pending.operation} previewPhase={shownPhase} />}
             {overlay && <div className="fixed inset-0 z-[100] grid place-items-center bg-nexo-ink/90">
                 <div className="nexo-card w-full max-w-xl space-y-4 p-8 text-slate-100">
-                    <p className="nexo-eyebrow">Comprobante de ejemplo</p><h2 className="text-2xl font-bold">Transferencia recibida</h2>
-                    <p>Referencia {submission.reference}</p><p>Valor $85.000 COP</p><p>Medio {submission.method}</p>
+                    {overlay === 'receipt' && <><p className="nexo-eyebrow">Comprobante de ejemplo</p><h2 className="text-2xl font-bold">Transferencia recibida</h2><p>Referencia {submission.reference}</p><p>Valor $85.000 COP</p><p>Medio {submission.method}</p></>}
+                    {email && <>
+                        <p className="nexo-eyebrow">Correo de ejemplo</p>
+                        <h2 className="text-2xl font-bold">{email.title}</h2>
+                        <p className="text-sm text-slate-400">Para {email.recipient}</p>
+                        <p>{email.message}</p>
+                        {email.hasChargeList && <div className="flex items-center justify-between gap-4 border-t border-slate-700 pt-3">
+                            <div>
+                                <p className="font-semibold">{athlete.name}</p>
+                                <p className="text-sm text-slate-300">Natación · Pendiente</p>
+                                <p className="text-sm text-slate-300">Vence el 18/11/2026 · $85.000 COP</p>
+                            </div>
+                            <span className="rounded-md bg-green-800 px-3 py-2 text-sm font-bold text-white">WhatsApp</span>
+                        </div>}
+                        {email.detail && <p className="rounded-xl bg-nexo-ink p-4 font-semibold text-nexo-lime">{email.detail}</p>}
+                    </>}
                 </div>
             </div>}
         </PreviewContext.Provider>,
@@ -97,6 +133,10 @@ function reset(id: string) {
     loginAttempts = 0;
     userName = 'Ana Pérez';
     props = structuredClone(fixtures(id));
+    if (id === 'notificaciones-plataforma') {
+        props['memberships.index'].charges = pageList([charge]);
+        props['memberships.index'].paymentSubmissions = [];
+    }
     navigate(scenarios[id].page);
     if (id === 'portal-deportista' || id === 'mensualidades-comprobante') role = 'deportista';
     toast.remove();
@@ -110,6 +150,7 @@ function routeKey(url: string) {
 setPreviewVisit((verb, url, data, done) => {
     const name = routeKey(url);
     if (verb === 'get' && name in pages) {
+        if (scenarioId === 'notificaciones-plataforma' && name === 'memberships.index') revision++;
         navigate(name);
         return;
     }
@@ -239,6 +280,12 @@ function processTime(next: number) {
 
 walk({ composition, catalog, host, reset, processTime, perform(action: Action) {
     const [, kind, target] = action;
+    if (kind === 'email') { overlay = target!; paint(); return; }
+    if (kind === 'billing-cut') {
+        props['memberships.index'].charges = pageList([{ ...charge, status: 'overdue' }]);
+        paint();
+        return;
+    }
     if (kind === 'page') { navigate(target!); paint(); }
     if (kind === 'resolve') { overlay = ''; paint(); }
 }, repaint: paint });

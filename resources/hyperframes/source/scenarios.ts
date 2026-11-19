@@ -1,4 +1,4 @@
-export type Action = [offset: number, kind: 'click' | 'type' | 'file' | 'view' | 'resolve' | 'page', target?: string, value?: string];
+export type Action = [offset: number, kind: 'click' | 'type' | 'file' | 'view' | 'email' | 'billing-cut' | 'resolve' | 'page', target?: string, value?: string];
 type Beat = [seconds: number, ...actions: Action[]];
 type Scenario = { page: string; beats: Beat[] };
 
@@ -74,6 +74,19 @@ export const scenarios: Record<string, Scenario> = {
         [10, [1, 'view', 'Medios del club'], [4, 'click', 'Nequi del club'], [6, 'click', 'Nequi del club'], [8, 'type', 'Referencia (opcional)', 'NEXO-018']],
         [24, [1, 'file', 'input[type=file]'], [5, 'click', 'Enviar comprobante']],
         [8, [1, 'view', 'Comprobante enviado; pendiente de revisión.']],
+    ] },
+    'notificaciones-plataforma': { page: 'memberships.index', beats: [
+        [8, [1, 'view', 'Cargos del club'], [4, 'view', 'Pendiente']],
+        [10, [1, 'click', 'Abrir centro de notificaciones'], [4, 'view', 'Pendientes de pago'], [6, 'view', 'Vence 18 de noviembre de 2026']],
+        [10, [1, 'billing-cut'], [4, 'view', 'Vencido'], [7, 'click', 'Ver recaudos y gestionar pagos']],
+        [10, [1, 'view', 'Vencida'], [3, 'click', 'Registrar pago'], [7, 'view', 'Pagada']],
+    ] },
+    'notificaciones-correo': { page: 'athlete.payments', beats: [
+        [8, [0, 'email', 'reminder'], [2, 'view', 'Recordatorio de mensualidad']],
+        [8, [0, 'email', 'due'], [2, 'view', 'Tu mensualidad vence hoy']],
+        [8, [0, 'email', 'report'], [2, 'view', 'WhatsApp'], [5, 'view', 'pendientes-por-cobrar.xlsx']],
+        [12, [0, 'email', 'suspension'], [2, 'view', 'Inscripción suspendida por falta de pago'], [6, 'email', 'admin-suspension'], [8, 'view', 'Inscripción suspendida por falta de pago']],
+        [8, [0, 'email', 'activation'], [2, 'view', 'Tu cuenta de NEXO CLUB ya está activa']],
     ] },
     'auditoria-operaciones': { page: 'platform.dashboard', beats: [
         [6, [2, 'click', 'Logs de auditoría']],

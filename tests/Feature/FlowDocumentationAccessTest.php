@@ -30,6 +30,10 @@ class FlowDocumentationAccessTest extends TestCase
                     fn ($guide) => ! in_array('Superadmin', $guide['roles'], true)
                 ))
                 ->has('videos.deportistas-perfil')
+                ->where('videos.notificaciones-plataforma.src', fn ($src) => str_starts_with($src, asset('flow-videos/notificaciones-plataforma.mp4')))
+                ->where('videos.notificaciones-plataforma.poster', asset('flow-videos/notificaciones-plataforma.jpg'))
+                ->where('videos.notificaciones-correo.src', fn ($src) => str_starts_with($src, asset('flow-videos/notificaciones-correo.mp4')))
+                ->where('videos.notificaciones-correo.poster', asset('flow-videos/notificaciones-correo.jpg'))
                 ->missing('videos.acceso-superadmin')
                 ->missing('videos.clubes-global')
                 ->missing('videos.auditoria-operaciones'));

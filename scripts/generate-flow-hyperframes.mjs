@@ -48,7 +48,7 @@ const template = (id, title, duration, assets) => `<!doctype html>
     <style>
         html, body { width: 1280px; height: 720px; margin: 0; overflow: hidden; }
         *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
-        #app main { padding-bottom: 130px; }
+        #app main { padding-bottom: 130px; }${id === 'notificaciones-plataforma' ? '\n        [role="dialog"]:has([aria-label="Cerrar notificaciones"]) { padding-bottom: 116px; }' : ''}
         #guide-footer { position: fixed; z-index: 400; display: grid; grid-template-columns: 280px 1fr; gap: 24px; align-items: center; inset: auto 18px 14px; min-height: 88px; padding: 12px 22px 14px; border-radius: 16px; border: 1px solid #425565; background: #0b1220; box-shadow: 0 8px 24px #03071099; }
         #guide-section { color: #b8f34b; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .12em; }
         #guide-title { color: #f8fafc; font-size: 19px; font-weight: 800; line-height: 1.2; margin-top: 4px; }
