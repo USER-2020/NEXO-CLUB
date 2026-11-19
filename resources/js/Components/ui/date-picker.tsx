@@ -8,8 +8,8 @@ const weekDays = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
 const months = Array.from({ length: 12 }, (_, month) => new Intl.DateTimeFormat('es-CO', { month: 'short' }).format(new Date(2020, month, 1)).replace('.', ''));
 
 function parseDate(value: unknown) {
-    if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return new Date();
-    const [year, month, day] = value.split('-').map(Number);
+    if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}/.test(value)) return new Date();
+    const [year, month, day] = value.slice(0, 10).split('-').map(Number);
     return new Date(year, month - 1, day);
 }
 

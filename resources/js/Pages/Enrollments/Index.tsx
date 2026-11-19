@@ -25,7 +25,7 @@ export default function Index({ enrollments: paginatedEnrollments, athletes, dis
     const { data, setData, post, patch, processing, errors, reset, clearErrors } = useForm<FormData>({ athlete_id: '', discipline_id: '', start_date: todayIso, monthly_amount: '', due_day: String(today.getDate()) });
     const openCreate = () => { const currentDate = new Date(); setEditing(null); setStep(1); setDueDayOverridden(false); reset(); setData('start_date', `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`); setData('due_day', String(currentDate.getDate())); clearErrors(); setModalOpen(true); };
     const startEditing = (enrollment: Enrollment) => {
-        const startDay = Number(enrollment.start_date.slice(-2));
+        const startDay = Number(enrollment.start_date.slice(0, 10).slice(-2));
         setEditing(enrollment);
         setStep(1);
         setDueDayOverridden(enrollment.due_day !== startDay);
