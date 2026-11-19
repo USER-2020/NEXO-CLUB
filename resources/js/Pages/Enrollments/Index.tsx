@@ -24,7 +24,15 @@ export default function Index({ enrollments: paginatedEnrollments, athletes, dis
     const [modalOpen, setModalOpen] = useState(false); const [editing, setEditing] = useState<Enrollment | null>(null); const [step, setStep] = useState(1); const [dueDayOverridden, setDueDayOverridden] = useState(false);
     const { data, setData, post, patch, processing, errors, reset, clearErrors } = useForm<FormData>({ athlete_id: '', discipline_id: '', start_date: todayIso, monthly_amount: '', due_day: String(today.getDate()) });
     const openCreate = () => { const currentDate = new Date(); setEditing(null); setStep(1); setDueDayOverridden(false); reset(); setData('start_date', `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`); setData('due_day', String(currentDate.getDate())); clearErrors(); setModalOpen(true); };
-    const startEditing = (enrollment: Enrollment) => { setEditing(enrollment); setStep(1); setDueDayOverridden(true); clearErrors(); setData({ athlete_id: String(enrollment.athlete_id), discipline_id: String(enrollment.discipline_id), start_date: enrollment.start_date, monthly_amount: String(enrollment.monthly_amount), due_day: String(enrollment.due_day) }); setModalOpen(true); };
+    const startEditing = (enrollment: Enrollment) => {
+        const startDay = Number(enrollment.start_date.slice(-2));
+        setEditing(enrollment);
+        setStep(1);
+        setDueDayOverridden(enrollment.due_day !== startDay);
+        clearErrors();
+        setData({ athlete_id: String(enrollment.athlete_id), discipline_id: String(enrollment.discipline_id), start_date: enrollment.start_date, monthly_amount: String(enrollment.monthly_amount), due_day: String(enrollment.due_day) });
+        setModalOpen(true);
+    };
     const closeModal = () => { setModalOpen(false); setEditing(null); setStep(1); reset(); clearErrors(); };
     const submit = () => { if (step !== 2 || processing) return; const options = { preserveScroll: true, onSuccess: closeModal }; if (editing) patch(route('enrollments.update', editing.id), options); else post(route('enrollments.store'), options); };
     const changeStatus = (enrollment: Enrollment, action: 'activate' | 'suspend' | 'cancel') => { const text = action === 'activate' ? 'activar' : action === 'suspend' ? 'suspender' : 'cancelar'; confirmToast({ title: `${text.charAt(0).toUpperCase() + text.slice(1)} inscripción`, description: `Se va a ${text} la inscripción de ${enrollment.athlete.first_name} ${enrollment.athlete.last_name}.`, confirmLabel: text.charAt(0).toUpperCase() + text.slice(1), onConfirm: () => router.patch(route('enrollments.status', enrollment.id), { action }, { preserveScroll: true }) }); };
