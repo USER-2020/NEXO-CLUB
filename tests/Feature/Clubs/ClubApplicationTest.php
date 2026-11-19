@@ -18,6 +18,7 @@ class ClubApplicationTest extends TestCase
     public function test_superadmin_approval_activates_account_creates_club_and_sends_email(): void
     {
         Mail::fake();
+        config(['nexo.notifications.enabled' => true]);
         [$superadmin, $application] = $this->makeApplication();
 
         $response = $this->actingAs($superadmin)->patch(route('platform.club-applications.approve', $application));
